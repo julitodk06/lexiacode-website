@@ -277,56 +277,17 @@ export function ChatbotWidget() {
       return
     }
 
-    try {
-      // Consultar API backend con el mensaje e historial de conversación para darle memoria contextual
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: userQuery,
-          history: messages.slice(-5) // Envía los últimos 5 mensajes
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error("Falla en la API")
-      }
-
-      const data = await response.json()
-      setIsTyping(false)
-
-      if (data.fallback) {
-        // Si el servidor activa el fallback
-        const botResponse: Message = {
-          id: Date.now().toString(),
-          text: getBotResponse(userQuery),
-          sender: "bot",
-          timestamp: new Date()
-        }
-        setMessages((prev) => [...prev, botResponse])
-      } else {
-        // Respuesta exitosa del motor conversacional de Gemini IA
-        const botResponse: Message = {
-          id: Date.now().toString(),
-          text: data.text,
-          sender: "bot",
-          timestamp: new Date()
-        }
-        setMessages((prev) => [...prev, botResponse])
-      }
-    } catch (error) {
-      console.error("Fallo al conectar con el servidor de IA, activando motor determinista:", error)
+    // Respuesta estática y determinista local sin requerimiento de red ni backend
+    setTimeout(() => {
       setIsTyping(false)
       const botResponse: Message = {
-        id: Date.now().toString(),
+        id: (Date.now() + 1).toString(),
         text: getBotResponse(userQuery),
         sender: "bot",
         timestamp: new Date()
       }
       setMessages((prev) => [...prev, botResponse])
-    }
+    }, 450)
   }
 
   return (

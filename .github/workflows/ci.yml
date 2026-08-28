@@ -2,19 +2,19 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, fix/* ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js LTS
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -23,5 +23,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js project
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript validation
+        run: npm run typecheck
+
+      - name: Build and static export
         run: npm run build
+
+      - name: Security audit check (high/critical)
+        run: npm audit --audit-level=high

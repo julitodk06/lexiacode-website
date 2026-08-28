@@ -522,7 +522,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <span className="text-[11px] font-bold text-white tracking-wide">Pruebas &amp; QA</span>
-                  <span className="text-[9px] text-[#B8C2D6] leading-tight mt-0.5">Revisión Criptográfica</span>
+                  <span className="text-[9px] text-[#B8C2D6] leading-tight mt-0.5">Revisión de lógica y riesgos comunes</span>
                 </div>
 
                 {/* Due Diligence */}
@@ -917,12 +917,12 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
               <div className="max-w-2xl">
-                <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Casos Reales</p>
+                <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Iniciativas y casos de producto</p>
                 <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                   Proyectos Destacados (RWA)
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
-                  Conocé algunos de los desarrollos tecnológicos y legales que ya estamos estructurando en Latinoamérica.
+                  Conocé propuestas y trabajos técnicos en distintas etapas, presentados con su estado real y sin implicar operaciones cerradas, financiadas o implementadas integralmente.
                 </p>
               </div>
               <a href="#contacto" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors shrink-0">

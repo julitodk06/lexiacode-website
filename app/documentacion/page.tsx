@@ -85,7 +85,7 @@ export default function DocumentacionPage() {
 
             {/* Pseudocódigo ilustrativo */}
             <div className="mt-12 rounded-2xl border border-border/40 bg-black/40 p-6 font-mono text-xs overflow-x-auto">
-              <span className="text-muted-foreground">// Pseudocódigo ilustrativo de arquitectura conceptual (No ejecutable en producción)</span>
+              <span className="text-muted-foreground">{"// Pseudocódigo ilustrativo de arquitectura conceptual (No ejecutable en producción)"}</span>
               <pre className="mt-3 text-primary-foreground">
                 <code className="text-blue-400">const</code>{" "}
                 <code className="text-foreground">referenceConfig = {"{"} contractStandard: &apos;ERC-3643&apos;, environment: &apos;TESTNET_SIMULATION&apos; {"}"};</code>

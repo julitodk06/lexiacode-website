@@ -31,8 +31,8 @@ export function TechBackground() {
       size: number; opacity: number; color: string
 
       constructor() {
-        this.x = Math.random() * canvas.width
-        this.y = Math.random() * canvas.height
+        this.x = Math.random() * (canvas?.width || window.innerWidth)
+        this.y = Math.random() * (canvas?.height || window.innerHeight)
         this.vx = (Math.random() - 0.5) * 0.25
         this.vy = (Math.random() - 0.5) * 0.25
         this.size = Math.random() * 1.5 + 0.5
@@ -53,8 +53,10 @@ export function TechBackground() {
 
         this.x += this.vx
         this.y += this.vy
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1
+        if (canvas) {
+          if (this.x < 0 || this.x > canvas.width) this.vx *= -1
+          if (this.y < 0 || this.y > canvas.height) this.vy *= -1
+        }
       }
 
       draw() {
@@ -79,8 +81,8 @@ export function TechBackground() {
       pulsePos: number; pulseSpeed: number; opacity: number
 
       constructor() {
-        this.startX = Math.random() * canvas.width
-        this.startY = Math.random() * canvas.height
+        this.startX = Math.random() * (canvas?.width || window.innerWidth)
+        this.startY = Math.random() * (canvas?.height || window.innerHeight)
         this.segments = this.generatePath()
         this.pulsePos = Math.random()
         this.pulseSpeed = Math.random() * 0.006 + 0.002
@@ -148,6 +150,7 @@ export function TechBackground() {
     }
 
     function drawGrid() {
+      if (!canvas) return
       const isLight = document.documentElement.classList.contains("light")
       const gridSize = 80
       ctx!.strokeStyle = isLight ? "#e0e5eb" : "#1a2a3a"
@@ -169,6 +172,7 @@ export function TechBackground() {
     }
 
     function animate() {
+      if (!canvas) return
       const isLight = document.documentElement.classList.contains("light")
       
       // DECISIÓN DE ACCESIBILIDAD: El fondo se pinta dinámicamente según el tema activo para garantizar 100% de legibilidad en claro u oscuro
