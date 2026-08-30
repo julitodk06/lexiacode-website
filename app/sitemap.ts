@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date()
 
   const routes = [
-    '',
+    '/',
     '/agentes-ia/',
     '/blog/',
     '/como-funciona/',
@@ -35,9 +35,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ]
 
   return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: route === '/' ? `${baseUrl}/` : `${baseUrl}${route}`,
     lastModified: currentDate,
-    changeFrequency: route === '' ? 'daily' : 'weekly',
-    priority: route === '' ? 1.0 : route === '/servicios/' || route === '/sobre-nosotros/' ? 0.8 : 0.6,
+    changeFrequency: route === '/' ? 'daily' : 'weekly',
+    priority: route === '/' ? 1.0 : route === '/servicios/' || route === '/sobre-nosotros/' ? 0.8 : 0.6,
   }))
 }

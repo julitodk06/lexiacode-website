@@ -7,13 +7,23 @@ export interface RouteMetadataOptions {
   keywords?: string[]
 }
 
+export function normalizeRoutePath(rawPath: string): string {
+  const trimmed = rawPath.trim()
+  if (!trimmed || trimmed === '/') {
+    return '/'
+  }
+  const clean = trimmed.replace(/^\/+|\/+$/g, '')
+  return `/${clean}/`
+}
+
 export function createRouteMetadata({
   title,
   description,
   path,
   keywords = [],
 }: RouteMetadataOptions): Metadata {
-  const url = `https://lexiacode.com${path.startsWith('/') ? path : `/${path}`}`
+  const normalizedPath = normalizeRoutePath(path)
+  const url = `https://lexiacode.com${normalizedPath}`
 
   return {
     title,
@@ -28,7 +38,7 @@ export function createRouteMetadata({
       'Solidity',
     ],
     alternates: {
-      canonical: path,
+      canonical: normalizedPath,
     },
     openGraph: {
       title,
@@ -39,9 +49,9 @@ export function createRouteMetadata({
       type: 'website',
       images: [
         {
-          url: '/hero_custom_new.png',
-          width: 1200,
-          height: 630,
+          url: 'https://lexiacode.com/hero_custom_new.png',
+          width: 1672,
+          height: 941,
           alt: `${title} — LexiaCode`,
         },
       ],
@@ -50,7 +60,7 @@ export function createRouteMetadata({
       card: 'summary_large_image',
       title,
       description,
-      images: ['/hero_custom_new.png'],
+      images: ['https://lexiacode.com/hero_custom_new.png'],
     },
   }
 }

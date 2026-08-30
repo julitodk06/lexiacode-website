@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename)
 const rootDir = path.resolve(__dirname, '..')
 const outDir = path.join(rootDir, 'out')
 
-console.log('=== LexiaCode Static Export Verification Gate (v3.1) ===\n')
+console.log('=== LexiaCode Static Export Verification Gate (v4B.1) ===\n')
 
 let errors = 0
 
@@ -62,23 +62,77 @@ for (const doc of EXPECTED_HTML_DOCUMENTS) {
 
 // 3. Comprobando sitemap.xml y robots.txt (Total 28 endpoints)
 console.log('\n--- Comprobando Endpoints de Indexación (2) ---')
-if (fs.existsSync(path.join(outDir, 'sitemap.xml'))) {
+const sitemapPath = path.join(outDir, 'sitemap.xml')
+if (fs.existsSync(sitemapPath)) {
   console.log('  [✓] /sitemap.xml -> out/sitemap.xml')
 } else {
   console.error('  [X] sitemap.xml no encontrado en out/')
   errors++
 }
 
-if (fs.existsSync(path.join(outDir, 'robots.txt'))) {
+const robotsPath = path.join(outDir, 'robots.txt')
+if (fs.existsSync(robotsPath)) {
   console.log('  [✓] /robots.txt -> out/robots.txt')
 } else {
   console.error('  [X] robots.txt no encontrado en out/')
   errors++
 }
 
-console.log(`  [✓] Balance verificado: 26 HTML + 1 sitemap.xml + 1 robots.txt = 28 endpoints estáticos.`)
+// 4. Verificación y Reconciliación Exhaustiva de sitemap.xml
+console.log('\n--- Reconciliación de sitemap.xml vs 25 Páginas Públicas Indexables ---')
+if (fs.existsSync(sitemapPath)) {
+  const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8')
+  const locRegex = /<loc>(.*?)<\/loc>/gi
+  const sitemapUrls = []
+  let locMatch
+  while ((locMatch = locRegex.exec(sitemapContent)) !== null) {
+    sitemapUrls.push(locMatch[1].trim())
+  }
 
-// 4. Escaneo de seguridad (cadenas prohibidas y backend residual)
+  // Verificar duplicados en sitemap
+  const urlCounts = new Map()
+  for (const url of sitemapUrls) {
+    urlCounts.set(url, (urlCounts.get(url) || 0) + 1)
+  }
+  for (const [url, count] of urlCounts.entries()) {
+    if (count > 1) {
+      console.error(`  [X] URL duplicada en sitemap.xml (${count} veces): ${url}`)
+      errors++
+    }
+  }
+
+  // 25 rutas indexables esperadas en sitemap
+  const EXPECTED_SITEMAP_URLS = EXPECTED_HTML_DOCUMENTS
+    .filter(doc => doc !== '_not-found/index.html')
+    .map(doc => {
+      if (doc === 'index.html') return 'https://lexiacode.com/'
+      return `https://lexiacode.com/${doc.replace('/index.html', '')}/`
+    })
+
+  // Comprobar que _not-found NO esté en sitemap
+  if (sitemapUrls.some(u => u.includes('_not-found'))) {
+    console.error('  [X] La ruta técnica /_not-found está incorrectamente incluida en sitemap.xml')
+    errors++
+  }
+
+  // Comprobar que todas las 25 rutas esperadas estén en el sitemap
+  for (const expectedUrl of EXPECTED_SITEMAP_URLS) {
+    if (!sitemapUrls.includes(expectedUrl)) {
+      console.error(`  [X] URL faltante en sitemap.xml: ${expectedUrl}`)
+      errors++
+    }
+  }
+
+  // Comprobar que el total sea exactamente 25
+  if (sitemapUrls.length !== 25) {
+    console.error(`  [X] Conteo inesperado de URLs en sitemap.xml: ${sitemapUrls.length} (esperadas: 25)`)
+    errors++
+  } else {
+    console.log(`  [✓] sitemap.xml contiene exactamente 25 URLs públicas reconciliadas (0 duplicadas, 0 no-indexables).`)
+  }
+}
+
+// 5. Escaneo de seguridad (cadenas prohibidas y backend residual)
 console.log('\n--- Escaneo de Seguridad e Integridad en out/ ---')
 
 function getAllOutFiles(dir, files = []) {
@@ -110,10 +164,9 @@ for (const file of allOutFiles) {
   }
 }
 
-// 5. Análisis exhaustivo de enlaces internos, anchors y assets en los 26 HTML
+// 6. Análisis exhaustivo de enlaces internos, anchors y assets en los 26 HTML
 console.log('\n--- Validación de Enlaces Internos, Anchors y Assets Locales ---')
 
-// Helper para extraer atributos href, src y srcset
 function extractAttributes(html, attrName) {
   const regex = new RegExp(`${attrName}=["']([^"']+)["']`, 'gi')
   const results = []
@@ -124,7 +177,6 @@ function extractAttributes(html, attrName) {
   return results
 }
 
-// Cache de IDs por documento HTML para validación rápida de anchors
 const htmlIdCache = new Map()
 
 function getHtmlIds(filePath) {
@@ -154,7 +206,6 @@ for (const htmlDoc of EXPECTED_HTML_DOCUMENTS) {
   // A. Extraer y validar href
   const hrefs = extractAttributes(content, 'href')
   for (const href of hrefs) {
-    // Ignorar protocolos externos o especiales
     if (
       href.startsWith('http://') ||
       href.startsWith('https://') ||
@@ -168,33 +219,29 @@ for (const htmlDoc of EXPECTED_HTML_DOCUMENTS) {
 
     checkedLinksCount++
 
-    // Rechazar href vacíos, placeholder o javascript
     if (href === '#' || href === '' || href.startsWith('javascript:')) {
       console.error(`  [X] Enlace inválido/placeholder encontrado en ${relSource}: href="${href}"`)
       errors++
       continue
     }
 
-    // Rechazar ancla obsoleta /#contacto o #contacto
     if (href.includes('#contacto') || href === '/#contacto' || href === '#contacto') {
       console.error(`  [X] Enlace a ancla obsoleta #contacto en ${relSource}: href="${href}" (debe ser /#contact)`)
       errors++
       continue
     }
 
-    // Separar ruta y anchor
-    const [rawPath, rawAnchor] = href.split('#')
+    // Separar fragmento y query string
+    const [rawPathWithQuery, rawAnchor] = href.split('#')
+    const [rawPath] = rawPathWithQuery.split('?')
 
     let targetFilePath = null
 
     if (!rawPath || rawPath === '') {
-      // Anchor dentro de la misma página (ej: href="#contact" o href="#careers")
       targetFilePath = filePath
     } else {
-      // Ruta absoluta dentro de out/
       const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath
 
-      // Probar variaciones comunes en exportación estática
       const candidates = [
         path.join(outDir, cleanPath, 'index.html'),
         path.join(outDir, `${cleanPath}.html`),
@@ -215,7 +262,6 @@ for (const htmlDoc of EXPECTED_HTML_DOCUMENTS) {
       }
     }
 
-    // Si tiene anchor, verificar que el ID exista en el documento de destino
     if (rawAnchor) {
       const ids = getHtmlIds(targetFilePath)
       if (!ids.has(rawAnchor)) {
@@ -256,10 +302,7 @@ for (const htmlDoc of EXPECTED_HTML_DOCUMENTS) {
   }
 }
 
-console.log(`  [✓] ${checkedLinksCount} enlaces internos verificados con éxito (0 rotos, 0 href="#", 0 #contacto).`)
-console.log(`  [✓] ${checkedAssetsCount} referencias a assets locales validadas contra out/.`)
-
-// 6. Verificación específica del ancla canónica /#contact y /sobre-nosotros/#careers
+// 7. Verificación de Anchors Canónicos Requeridos
 console.log('\n--- Comprobación de Anchors Canónicos Requeridos ---')
 const homeIds = getHtmlIds(path.join(outDir, 'index.html'))
 if (homeIds.has('contact')) {
@@ -277,22 +320,22 @@ if (sobreNosotrosIds.has('careers')) {
   errors++
 }
 
-// 7. Verificación de Metadatos SEO y Open Graph en páginas clave
-console.log('\n--- Verificación de Metadatos SEO y Open Graph (Fase 4B) ---')
-const SEVEN_ROUTES = [
-  'index.html',
-  'agentes-ia/index.html',
-  'blog/index.html',
-  'consultoria-legaltech/index.html',
-  'guia-tokenizacion/index.html',
-  'proyectos-rwa/index.html',
-  'smart-contracts/index.html',
-  'software-microsaas/index.html'
-]
+// 8. Verificación Exacta de Metadatos SEO, Canonicals y Open Graph
+console.log('\n--- Verificación Exacta de Metadatos SEO y Open Graph (Fase 4B.1) ---')
+const CANONICAL_MAP = {
+  'index.html': 'https://lexiacode.com/',
+  'agentes-ia/index.html': 'https://lexiacode.com/agentes-ia/',
+  'blog/index.html': 'https://lexiacode.com/blog/',
+  'consultoria-legaltech/index.html': 'https://lexiacode.com/consultoria-legaltech/',
+  'guia-tokenizacion/index.html': 'https://lexiacode.com/guia-tokenizacion/',
+  'proyectos-rwa/index.html': 'https://lexiacode.com/proyectos-rwa/',
+  'smart-contracts/index.html': 'https://lexiacode.com/smart-contracts/',
+  'software-microsaas/index.html': 'https://lexiacode.com/software-microsaas/'
+}
 
 const seenTitles = new Set()
 
-for (const routeHtml of SEVEN_ROUTES) {
+for (const [routeHtml, expectedCanonical] of Object.entries(CANONICAL_MAP)) {
   const full = path.join(outDir, routeHtml)
   if (!fs.existsSync(full)) {
     console.error(`  [X] Archivo HTML no encontrado: ${routeHtml}`)
@@ -302,7 +345,7 @@ for (const routeHtml of SEVEN_ROUTES) {
   const html = fs.readFileSync(full, 'utf-8')
   const rel = `out/${routeHtml}`
 
-  // Verificar <title> no vacío y diferenciado
+  // Title
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
   if (!titleMatch || !titleMatch[1].trim()) {
     console.error(`  [X] Falta <title> o está vacío en ${rel}`)
@@ -316,49 +359,58 @@ for (const routeHtml of SEVEN_ROUTES) {
     seenTitles.add(title)
   }
 
-  // Verificar <meta name="description" no vacía
+  // Meta description
   const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']description["']/i)
   if (!descMatch || !descMatch[1].trim()) {
     console.error(`  [X] Falta meta description en ${rel}`)
     errors++
   }
 
-  // Verificar canonical
+  // Canonical exacto
   const canonicalMatch = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || html.match(/<link\s+href=["']([^"']+)["']\s+rel=["']canonical["']/i)
-  if (!canonicalMatch || !canonicalMatch[1].trim()) {
+  if (!canonicalMatch) {
     console.error(`  [X] Falta link rel="canonical" en ${rel}`)
+    errors++
+  } else if (canonicalMatch[1] !== expectedCanonical) {
+    console.error(`  [X] Canonical incorrecto en ${rel}: obtenido "${canonicalMatch[1]}", esperado "${expectedCanonical}"`)
     errors++
   }
 
-  // Verificar og:title
+  // og:url exacto
+  const ogUrlMatch = html.match(/<meta\s+property=["']og:url["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:url["']/i)
+  if (!ogUrlMatch) {
+    console.error(`  [X] Falta meta og:url en ${rel}`)
+    errors++
+  } else if (ogUrlMatch[1] !== expectedCanonical) {
+    console.error(`  [X] og:url incorrecto en ${rel}: obtenido "${ogUrlMatch[1]}", esperado "${expectedCanonical}"`)
+    errors++
+  }
+
+  // og:title
   const ogTitleMatch = html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']/i)
   if (!ogTitleMatch || !ogTitleMatch[1].trim()) {
     console.error(`  [X] Falta meta og:title en ${rel}`)
     errors++
   }
 
-  // Verificar og:description
+  // og:description
   const ogDescMatch = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']/i)
   if (!ogDescMatch || !ogDescMatch[1].trim()) {
     console.error(`  [X] Falta meta og:description en ${rel}`)
     errors++
   }
 
-  // Verificar og:url
-  const ogUrlMatch = html.match(/<meta\s+property=["']og:url["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:url["']/i)
-  if (!ogUrlMatch || !ogUrlMatch[1].trim()) {
-    console.error(`  [X] Falta meta og:url en ${rel}`)
-    errors++
-  }
-
-  // Verificar og:image
+  // og:image absoluta
   const ogImageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i)
-  if (!ogImageMatch || !ogImageMatch[1].trim()) {
+  if (!ogImageMatch) {
     console.error(`  [X] Falta meta og:image en ${rel}`)
     errors++
+  } else if (!ogImageMatch[1].startsWith('https://lexiacode.com/')) {
+    console.error(`  [X] og:image debe ser URL absoluta bajo https://lexiacode.com/ en ${rel}: obtenido "${ogImageMatch[1]}"`)
+    errors++
   }
 
-  // Verificar twitter:card
+  // twitter:card
   const twitterCardMatch = html.match(/<meta\s+name=["']twitter:card["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']twitter:card["']/i)
   if (!twitterCardMatch || !twitterCardMatch[1].trim()) {
     console.error(`  [X] Falta meta twitter:card en ${rel}`)
@@ -366,11 +418,14 @@ for (const routeHtml of SEVEN_ROUTES) {
   }
 }
 
-console.log(`  [✓] Metadatos SEO (title diferenciado, description, canonical, OG y Twitter) verificados en las 8 rutas evaluadas.`)
-
 console.log(`\n========================================`)
 if (errors === 0) {
-  console.log(' [PASS] Exportación estática 100% verificada, libre de enlaces o assets rotos.')
+  console.log(` [PASS] Exportación estática 100% verificada:`)
+  console.log(`        - 26 documentos HTML + 1 sitemap.xml + 1 robots.txt = 28 endpoints estáticos.`)
+  console.log(`        - ${checkedLinksCount} enlaces internos verificados (0 rotos, 0 href="#", 0 #contacto).`)
+  console.log(`        - ${checkedAssetsCount} referencias a assets locales validadas contra out/.`)
+  console.log(`        - sitemap.xml reconciliado con 25 URLs indexables y canonicals exactos.`)
+  console.log(`        - Metadatos SEO, Open Graph y Twitter Cards validados en las 8 rutas estratégicas.`)
   process.exit(0)
 } else {
   console.error(` [FAIL] Se detectaron ${errors} problemas en la exportación estática.`)

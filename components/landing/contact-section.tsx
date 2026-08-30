@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,6 +13,22 @@ export function ContactSection() {
   const [formData, setFormData] = useState({ name: "", email: "", company: "", message: "" })
   const [selectedAsset, setSelectedAsset] = useState("")
   const [openedClient, setOpenedClient] = useState(false)
+
+  useEffect(() => {
+    const handlePrefill = (e: Event) => {
+      const customEvent = e as CustomEvent<{ company?: string; message?: string }>
+      if (customEvent.detail) {
+        setFormData((prev) => ({
+          ...prev,
+          company: customEvent.detail.company ?? prev.company,
+          message: customEvent.detail.message ?? prev.message,
+        }))
+      }
+    }
+
+    window.addEventListener("lexia-contact-prefill", handlePrefill)
+    return () => window.removeEventListener("lexia-contact-prefill", handlePrefill)
+  }, [])
 
   const assetTypes = {
     en: [

@@ -5,7 +5,7 @@
 > Última revisión arquitectónica: 2026-08-30 (UTC)
 > Repositorio: https://github.com/julitodk06/lexiacode-website
 > Rama activa: **fix/public-repo-hardening**
-> Baseline de código analizada: **af04cb43240631fd820ab677ffe4685cebec7079**
+> Baseline funcional verificado: **203ca79116e09fb8533cf1970b92db20005a76ae**
 > Pull request: [Draft PR #1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)
 > Base de comparación: **main** en **9a3210d7881be3d604fe7d48cb94d48029ca7c07**
 
@@ -30,22 +30,22 @@ La rama activa está en proceso de endurecimiento previo a merge. El PR permanec
 | Persistencia | No existe base de datos |
 | Backend | No existe API activa ni runtime de servidor |
 | Integraciones | Contacto directo por mailto (`juliov@lexiacode.com`) y WhatsApp (`+54 381 540 0016`); chatbot local determinista |
-| Testing | Vitest v4 con jsdom, @testing-library/react y user-event (3 suites, 15 tests automatizados) |
+| Testing | Vitest v4 con jsdom, @testing-library/react y user-event (3 suites, 16 tests automatizados) |
 | CI | GitHub Actions con Node 20 LTS: lint, typecheck, tests, build SSG, test:static, reachability audit y npm audit |
 | Distribución | Artefacto estático generado en **out/** (26 documentos HTML + sitemap.xml + robots.txt = 28 endpoints estáticos) |
 
 ### Arquitectura funcional
 
-- **app/** contiene las 26 rutas públicas del App Router, layouts de servidor para inyección de metadatos SEO y el metadata institucional global en `layout.tsx`.
-- **components/landing/** contiene navegación, header adaptativo con selector de idiomas y scroll suave, how-it-works con heading configurable, y secciones de presentación.
-- **components/ui/** contiene componentes base accesibles y el chatbot local (`ChatbotWidget`) con diálogo semántico (`role="dialog"`), soporte de tecla Escape y navegación inter-ruta.
+- **app/** contiene las 26 rutas públicas del App Router (25 páginas públicas indexables + 1 página técnica `/_not-found`), layouts de servidor para inyección de metadatos SEO y el metadata institucional global en `layout.tsx`.
+- **components/landing/** contiene navegación, header adaptativo con selector de idiomas y scroll suave, how-it-works con heading configurable (`asPageHeading`), y formulario de contacto accesible (`ContactSection`).
+- **components/ui/** contiene componentes base accesibles y el chatbot local (`ChatbotWidget`) con diálogo semántico montado condicionalmente (`role="dialog"`), soporte de tecla Escape, restauración de foco y despacho de evento local para prellenado de contacto.
 - **lib/contact-links.ts** centraliza la construcción pura y codificada de enlaces `mailto:` y WhatsApp oficiales.
-- **lib/site-metadata.ts** helper centralizado para construcción de metadatos SEO, Open Graph y Twitter Cards por ruta.
+- **lib/site-metadata.ts** helper centralizado con normalización automática de rutas para construcción de metadatos SEO, canonicals exactos, Open Graph y Twitter Cards.
 - **lib/language-context.tsx** administra el idioma activo (`es`, `en`, `pt`), persistencia local en `localStorage["lexiacode-lang"]` y sincronización con `document.documentElement.lang`.
 - **lib/translations.ts** concentra textos estructurados en español, inglés y portugués.
 - **public/** contiene imágenes corporativas, diagramas, logos y `robots.txt`.
-- **app/sitemap.ts** genera `sitemap.xml` de manera estática para las 26 rutas del sitio.
-- **scripts/test-static-export.mjs** gate de verificación post-build que analiza 28 endpoints, integridad de links/anchors (resolución contra IDs en HTML) y metadatos SEO.
+- **app/sitemap.ts** genera `sitemap.xml` estático para las 25 páginas públicas indexables.
+- **scripts/test-static-export.mjs** gate de verificación post-build que analiza 28 endpoints, integridad de links/anchors (resolución contra IDs en HTML), reconciliación de sitemap vs canonicals y metadatos SEO.
 - **scripts/audit-reachability.mjs** auditor estático que valida alcanzabilidad de código fuente, assets y dependencias.
 - **.github/workflows/ci.yml** valida cada push a main o fix/* y cada PR hacia main.
 
@@ -56,19 +56,19 @@ La rama activa está en proceso de endurecimiento previo a merge. El PR permanec
 | Navegación pública | 26 rutas estáticas compiladas con enlaces internos normalizados a `/#contact` y `#careers` |
 | Sitio trilingüe | Español, inglés y portugués con conmutación dinámica y sincronización de `html lang` |
 | Preferencia de idioma | Se conserva en localStorage bajo la clave **lexiacode-lang** con fallback determinista a `en` |
-| Tema claro/oscuro | Operativo y accesible mediante next-themes en todas las páginas (incluyendo `/sobre-nosotros`) |
-| Chatbot orientativo | Totalmente determinista, accesible por teclado (Escape), con deslinde legal explícito y cero llamadas fetch |
-| Formulario de contacto | Formulario accesible con labels asociados vía `htmlFor`/`id`, aviso transparente de apertura de cliente de correo y cero fetch |
-| WhatsApp | Enlace oficial directo `https://wa.me/5493815400016` con mensaje preformateado |
-| SEO & Open Graph | `metadataBase`, canonicals diferenciados, Open Graph y Twitter Cards en todas las páginas |
-| Exportación estática | Build exitoso con 26 HTML + sitemap.xml + robots.txt = 28 endpoints estáticos en `out/` |
-| Testing automatizado | 15 tests unitarios e integrados (100% pasando sin dependencias de red) |
+| Tema claro/oscuro | Se migraron superficies y textos a tokens semánticos compatibles con temas claro y oscuro. No se realizó una certificación WCAG completa ni una medición automatizada exhaustiva de contraste. |
+| Chatbot orientativo | Totalmente determinista, no renderizado en DOM cuando está cerrado, accesible por teclado (Escape), con deslinde legal explícito y cero llamadas fetch |
+| Formulario de contacto | Formulario accesible con labels asociados vía `htmlFor`/`id`, prellenado React desde chatbot, aviso transparente de apertura de cliente de correo y cero fetch |
+| Canales oficiales | WhatsApp oficial (`+54 381 540 0016`), LinkedIn oficial y GitHub oficial (Twitter/X eliminado por inexistencia de perfil institucional) |
+| SEO & Open Graph | Metadata global disponible para todo el sitio y metadata diferenciada verificada para home y siete rutas estratégicas |
+| Exportación estática | Build exitoso con 26 HTML (25 indexables + `/_not-found`) + sitemap.xml + robots.txt = 28 endpoints estáticos en `out/` |
+| Testing automatizado | 16 tests unitarios e integrados (100% pasando sin dependencias de red) |
 | Seguridad de dependencias | npm audit reporta 0 vulnerabilidades |
 
 ### Rutas compiladas (28 endpoints estáticos)
 
 1. `/` (Home)
-2. `/_not-found`
+2. `/_not-found` (Página técnica de error)
 3. `/agentes-ia`
 4. `/blog`
 5. `/como-funciona`
@@ -93,7 +93,7 @@ La rama activa está en proceso de endurecimiento previo a merge. El PR permanec
 24. `/tokenizacion-inmobiliaria`
 25. `/tokenizacion-rwa`
 26. `/whitepaper`
-27. `/sitemap.xml`
+27. `/sitemap.xml` (25 URLs indexables)
 28. `/robots.txt`
 
 ## Contratos e Interfaces
@@ -113,7 +113,7 @@ La rama activa está en proceso de endurecimiento previo a merge. El PR permanec
 - El ancla canónica de contacto es estrictamente **/#contact** (correspondiente a `<section id="contact">`). Queda prohibido el uso de `/#contacto` o `#contacto`.
 - El ancla institucional de talento es **#careers** en `/sobre-nosotros/`.
 - No deben existir enlaces placeholder vacíos (`href="#"`, `href=""` o `javascript:`).
-- Los enlaces externos a redes sociales y mensajería deben incluir `target="_blank"` y `rel="noopener noreferrer"`. Enlaces autorizados: LinkedIn oficial y WhatsApp oficial. Se removió Twitter/X por inexistencia de perfil institucional.
+- Los enlaces externos a redes sociales y mensajería deben incluir `target="_blank"` y `rel="noopener noreferrer"`. Enlaces autorizados: LinkedIn oficial, GitHub oficial y WhatsApp oficial.
 
 ### Contrato de idiomas
 
@@ -154,7 +154,7 @@ Config Entrypoints en raíz (4):
 --- Reconciliación de Dependencias de Producción ---
   declaredProductionDependencies: 12
   directlyImported: 10
-  indirectlyRequired: 2 (postcss, tailwindcss-animate)
+  indirectlyRequired: 2 (react-dom, autoprefixer)
   unreferencedCandidates: 0
   Ecuación: 12 = 10 + 2 + 0 -> VERIFICADA [✓]
 ```
@@ -196,12 +196,20 @@ Config Entrypoints en raíz (4):
 
 ### FASE 4B — Corrección de accesibilidad, SEO y contenido [✓ COMPLETADA]
 - Inclusión de `asPageHeading?: boolean` en `HowItWorks` y `app/como-funciona/page.tsx` para garantizar un único `<h1>`.
-- Migración integral de `/sobre-nosotros` a tokens semánticos adaptativos (`bg-background`, `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`).
+- Migración integral de `/sobre-nosotros` a tokens semánticos adaptativos.
 - Inyección de metadatos SEO globales en `app/layout.tsx` (`metadataBase`, canonicals, OG, Twitter).
 - Creación de `lib/site-metadata.ts` y 7 layouts de servidor (`layout.tsx`) para páginas cliente.
 - Refuerzo de claims institucionales defendibles (iniciativa minera con valuación de referencia de ~USD 100M del activo subyacente analizado, estudio de producto/tecnología y perfil profesional).
 - Validación de metadatos SEO en `scripts/test-static-export.mjs`.
 - Documentado en `docs/PHASE_4B_CORRECTION_REPORT.md`.
+
+### FASE 4B.1 — Cierre de residuos de accesibilidad, SEO y documentación [✓ COMPLETADA]
+- Desmontaje total del diálogo del chatbot cuando `isOpen === false` (cero descendientes enfocables).
+- Sincronización del prellenado React en `ContactSection` vía evento customizado y selectores semánticos (`#contact-company`, `#contact-message`).
+- Normalización canónica en `lib/site-metadata.ts` con trailing slashes uniformes e imagen Open Graph verificada (`1672x941`).
+- Reconciliación estricta de `sitemap.xml` con 25 URLs indexables y exclusión de `/_not-found`.
+- Suite ampliada a 16 tests automatizados (100% pasando).
+- Documentado en `docs/PHASE_4B_1_RESIDUAL_FIX_REPORT.md`.
 
 ---
 
@@ -209,21 +217,10 @@ Config Entrypoints en raíz (4):
 
 La próxima unidad de trabajo es:
 
-**FASE 5 — Gobierno del repositorio y preparación controlada del PR**
-
-1. Revisar estado y protección de la rama `main`.
-2. Preparar el Pull Request #1 para revisión final.
-3. Documentar estrategia de release y rollback para despliegue estático.
+**FASE 5A — Auditoría de gobierno y preparación del plan del PR**
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5 — Gobierno del repositorio y preparación controlada del PR” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website.
-
-Antes de modificar:
-1. Lee PROJECT_STATE.md, docs/PHASE_3_TEST_REPORT.md y docs/PHASE_4B_CORRECTION_REPORT.md completos.
-2. Confirma que estás en la rama fix/public-repo-hardening y que el PR #1 sigue Draft.
-3. Registra el SHA inicial y ejecuta git status.
-4. No trabajes sobre main y no crees otra rama sin autorización.
-5. No hagas merge, deploy ni force push.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5A — Auditoría de gobierno y preparación del plan del PR” en el repositorio julitodk06/lexiacode-website.
 ~~~

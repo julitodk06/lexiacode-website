@@ -29,15 +29,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_AR',
-    url: 'https://lexiacode.com',
+    url: 'https://lexiacode.com/',
     siteName: 'LexiaCode',
     title: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
     description: 'Estudio de producto y tecnología especializado en arquitectura funcional, desarrollo de smart contracts en Solidity, microservicios y soluciones con IA.',
     images: [
       {
-        url: '/hero_custom_new.png',
-        width: 1200,
-        height: 630,
+        url: 'https://lexiacode.com/hero_custom_new.png',
+        width: 1672,
+        height: 941,
         alt: 'LexiaCode - Estudio de Producto, Web3 e Inteligencia Artificial',
       },
     ],
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
     description: 'Estudio de producto y tecnología especializado en arquitectura funcional, desarrollo de smart contracts en Solidity, microservicios y soluciones con IA.',
-    images: ['/hero_custom_new.png'],
+    images: ['https://lexiacode.com/hero_custom_new.png'],
   },
   keywords: ['tokenizacion en argentina', 'tokenizacion de activos argentina', 'tokenizar real estate argentina', 'RWA argentina', 'activos reales blockchain', 'smart contracts argentina', 'blockchain argentina'],
   icons: {

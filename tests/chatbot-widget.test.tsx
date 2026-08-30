@@ -23,42 +23,49 @@ describe('ChatbotWidget Hardened Tests', () => {
     vi.restoreAllMocks()
   })
 
-  it('manages aria-expanded, dialog role and aria-hidden appropriately on open and close', async () => {
+  it('unmounts dialog and prevents focusable descendants when closed; mounts role="dialog" on open', async () => {
     const user = userEvent.setup()
     render(<ChatbotWidget />)
+
+    // Antes de abrir: dialog, textbox y close button no deben existir en DOM
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByRole('textbox', { name: /mensaje para el asistente/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /cerrar asistente/i })).toBeNull()
 
     const triggerBtn = screen.getByRole('button', { name: /abrir asistente técnico/i })
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
     expect(triggerBtn).toHaveAttribute('aria-controls', 'chatbot-dialog')
 
-    const dialogContainer = document.getElementById('chatbot-dialog')
-    expect(dialogContainer).toHaveAttribute('role', 'dialog')
-    expect(dialogContainer).toHaveAttribute('aria-hidden', 'true')
-
-    // Open chatbot
+    // Al abrir: diálogo montado y aria-expanded = true
     await user.click(triggerBtn)
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'true')
-    expect(dialogContainer).toHaveAttribute('aria-hidden', 'false')
 
-    // Close chatbot via close button with aria-label
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toBeInTheDocument()
+    expect(dialog).toHaveAttribute('id', 'chatbot-dialog')
+    expect(dialog).toHaveAttribute('aria-labelledby', 'chatbot-title')
+
+    // Al cerrar: diálogo desmontado y foco devuelto
     const closeBtn = screen.getByRole('button', { name: /cerrar asistente/i })
-    expect(closeBtn).toBeInTheDocument()
     await user.click(closeBtn)
 
+    expect(screen.queryByRole('dialog')).toBeNull()
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
-    expect(dialogContainer).toHaveAttribute('aria-hidden', 'true')
+    expect(document.activeElement).toBe(triggerBtn)
   })
 
-  it('closes dialog on Escape key and restores focus to open button', async () => {
+  it('closes dialog on Escape key, unmounts it from DOM and restores focus to open button', async () => {
     const user = userEvent.setup()
     render(<ChatbotWidget />)
 
     const triggerBtn = screen.getByRole('button', { name: /abrir asistente técnico/i })
     await user.click(triggerBtn)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'true')
 
     // Press Escape key
     await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).toBeNull()
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
     expect(document.activeElement).toBe(triggerBtn)
   })

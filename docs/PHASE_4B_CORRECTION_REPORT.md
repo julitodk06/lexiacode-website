@@ -27,7 +27,7 @@ En la **FASE 4B** se resolvieron integralmente todas las observaciones identific
   * Textos: `text-foreground`, `text-muted-foreground`, `text-card-foreground`.
   * Bordes: `border-border/40`.
   * Acentos y detalles de marca conservados (`text-primary`, `#e87722`, degradados corporativos).
-* **Resultado:** Legibilidad óptima y contraste accesible en modos oscuro y claro.
+* **Resultado:** Se migraron superficies y textos a tokens semánticos compatibles con temas claro y oscuro. No se realizó una certificación WCAG completa ni una medición automatizada exhaustiva de contraste.
 
 ### C. Metadatos Globales en `app/layout.tsx`
 * Se configuró `metadataBase: new URL('https://lexiacode.com')`.
@@ -45,7 +45,7 @@ En la **FASE 4B** se resolvieron integralmente todas las observaciones identific
   5. `app/proyectos-rwa/layout.tsx` -> `/proyectos-rwa`
   6. `app/smart-contracts/layout.tsx` -> `/smart-contracts`
   7. `app/software-microsaas/layout.tsx` -> `/software-microsaas`
-* **Resultado:** Cada ruta exporta en su HTML estático final un `<title>` único y diferenciado, `<meta name="description">`, `<link rel="canonical">`, Open Graph y Twitter tags completos.
+* **Resultado:** Metadata global disponible para todo el sitio y metadata diferenciada verificada para home y siete rutas estratégicas. Cada una de estas rutas exporta en su HTML estático final un `<title>` único y diferenciado, `<meta name="description">`, `<link rel="canonical">`, Open Graph y Twitter tags completos.
 
 ### E. Endurecimiento del Gate de Exportación Estática (`scripts/test-static-export.mjs`)
 * Validación automatizada en CI de:

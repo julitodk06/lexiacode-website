@@ -112,22 +112,26 @@ export function ChatbotWidget() {
     }
 
     if (prefillText || prefillCompany) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("lexia-contact-prefill", { detail: { company: prefillCompany, message: prefillText } }))
+      }
+
       setTimeout(() => {
         if (prefillCompany) {
-          const companyInput = document.querySelector('input[placeholder*="Acme Corp"], input[placeholder*="Empresa"], input[id="company"]') as HTMLInputElement
+          const companyInput = document.querySelector('#contact-company') as HTMLInputElement
           if (companyInput) {
             companyInput.value = prefillCompany
             companyInput.dispatchEvent(new Event('input', { bubbles: true }))
           }
         }
         if (prefillText) {
-          const messageTextarea = document.querySelector('textarea[placeholder*="Tell us about your project"], textarea[placeholder*="mensaje"], textarea[id="message"]') as HTMLTextAreaElement
+          const messageTextarea = document.querySelector('#contact-message') as HTMLTextAreaElement
           if (messageTextarea) {
             messageTextarea.value = prefillText
             messageTextarea.dispatchEvent(new Event('input', { bubbles: true }))
           }
         }
-      }, 500)
+      }, 100)
     }
   }
 
@@ -346,6 +350,8 @@ export function ChatbotWidget() {
         aria-label="Abrir asistente técnico"
         aria-expanded={isOpen}
         aria-controls="chatbot-dialog"
+        tabIndex={isOpen ? -1 : 0}
+        aria-hidden={isOpen}
         className={`fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-all duration-300 hover:scale-110 focus:outline-none ${isOpen ? "scale-0 opacity-0 pointer-events-none" : "scale-100 opacity-100"}`}
       >
         <MessageSquare className="h-6 w-6" />
@@ -356,14 +362,14 @@ export function ChatbotWidget() {
       </button>
 
       {/* Ventana de chat */}
-      <div
-        id="chatbot-dialog"
-        role="dialog"
-        aria-labelledby="chatbot-title"
-        aria-hidden={!isOpen}
-        className={`fixed bottom-6 right-6 z-50 w-[350px] sm:w-[380px] transition-all duration-300 origin-bottom-right ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}`}
-      >
-        <Card className="flex h-[530px] flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-xl">
+      {isOpen && (
+        <div
+          id="chatbot-dialog"
+          role="dialog"
+          aria-labelledby="chatbot-title"
+          className="fixed bottom-6 right-6 z-50 w-[350px] sm:w-[380px] transition-all duration-300 origin-bottom-right scale-100 opacity-100"
+        >
+          <Card className="flex h-[530px] flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-xl">
           {/* Header */}
           <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 bg-muted/30 px-4 py-3 space-y-0">
             <div className="flex items-center gap-3">
@@ -514,6 +520,7 @@ export function ChatbotWidget() {
           </CardFooter>
         </Card>
       </div>
+      )}
     </>
   )
 }

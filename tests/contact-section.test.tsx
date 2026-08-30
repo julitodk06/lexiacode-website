@@ -2,12 +2,21 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ContactSection } from '@/components/landing/contact-section'
+import { ChatbotWidget } from '@/components/ui/chatbot-widget'
 import { LanguageProvider } from '@/lib/language-context'
 import { buildMailtoUrl, buildWhatsAppUrl, OFFICIAL_CONTACT } from '@/lib/contact-links'
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+  usePathname: () => '/',
+}))
 
 describe('ContactSection Hardened Tests', () => {
   beforeEach(() => {
     localStorage.clear()
+    vi.clearAllMocks()
   })
 
   it('renders all four form fields accessible by label text with matching HTML IDs', () => {
@@ -46,7 +55,7 @@ describe('ContactSection Hardened Tests', () => {
     const nameInput = screen.getByLabelText(/Full Name|Nombre Completo|Nome Completo/i)
     const emailInput = screen.getByLabelText(/Email Address|Correo Electrónico|Endereço de Email/i)
     const companyInput = screen.getByLabelText(/Company \/ Project|Empresa \/ Proyecto|Empresa \/ Projeto/i)
-    const messageInput = screen.getByLabelText(/Tell us about your project|Cuéntanos sobre tu iniciativa|Conte-nos sobre seu projeto/i)
+    const messageInput = screen.getByLabelText(/Tell us about your project|Cuéntanos sobre tu iniciativa|Conte-nos sobre seu proyecto/i)
 
     await user.type(nameInput, 'Sofia Ramos')
     await user.type(emailInput, 'sofia@iniciativa.com')
@@ -116,4 +125,68 @@ describe('ContactSection Hardened Tests', () => {
 
     openSpy.mockRestore()
   })
+
+  it('updates form controlled state and pre-fills company and message when user triggers diagnostic CTA from chatbot on home', async () => {
+    const user = userEvent.setup()
+    const scrollSpy = vi.fn()
+
+    render(
+      <LanguageProvider>
+        <ContactSection />
+        <ChatbotWidget />
+      </LanguageProvider>
+    )
+
+    const contactSection = document.getElementById('contact')
+    if (contactSection) {
+      contactSection.scrollIntoView = scrollSpy
+    }
+
+    // 1. Open chatbot
+    const openBtn = screen.getByRole('button', { name: /abrir asistente técnico/i })
+    await user.click(openBtn)
+
+    // 2. Select initial diagnostic option
+    const viableBtn = screen.getByText('¿Mi activo puede tokenizarse?')
+    await user.click(viableBtn)
+
+    // Wait for step 1 question to render
+    await screen.findByText(/1\. ¿Qué tipo de activo o proceso buscas modelar\?/i, {}, { timeout: 3000 })
+    const input = screen.getByRole('textbox', { name: /mensaje para el asistente/i })
+    const sendBtn = screen.getByRole('button', { name: /enviar mensaje/i })
+
+    // Answer question 1
+    await user.type(input, 'Desarrollo Inmobiliario')
+    await user.click(sendBtn)
+
+    // Wait for step 2 question
+    await screen.findByText(/2\. ¿En qué estado se encuentra la documentación técnica/i, {}, { timeout: 3000 })
+    await user.type(input, 'Documentación completa')
+    await user.click(sendBtn)
+
+    // Wait for step 3 question
+    await screen.findByText(/3\. ¿Qué componentes técnicos requeriría el prototipo\?/i, {}, { timeout: 3000 })
+    await user.type(input, 'Smart contracts ERC-3643')
+    await user.click(sendBtn)
+
+    // Wait for step 4 question
+    await screen.findByText(/4\. ¿En qué etapa se encuentra actualmente la iniciativa\?/i, {}, { timeout: 3000 })
+    await user.type(input, 'Prototipo en evaluación')
+    await user.click(sendBtn)
+
+    // Wait for final summary and CTA button
+    await screen.findByText(/Resumen de Diagnóstico Técnico Preliminar/i, {}, { timeout: 3000 })
+    const ctaBtn = await screen.findByRole('button', { name: /coordinar evaluación técnica/i }, { timeout: 3000 })
+    await user.click(ctaBtn)
+
+    // 5. Verify scrollIntoView and prefilling
+    expect(scrollSpy).toHaveBeenCalled()
+
+    const companyInput = screen.getByLabelText(/Company \/ Project|Empresa \/ Proyecto|Empresa \/ Projeto/i) as HTMLInputElement
+    const messageInput = screen.getByLabelText(/Tell us about your project|Cuéntanos sobre tu iniciativa|Conte-nos sobre seu proyecto/i) as HTMLTextAreaElement
+
+    expect(companyInput.value).toBe('Iniciativa Técnica Web3 / RWA')
+    expect(messageInput.value).toContain('Desarrollo Inmobiliario')
+    expect(messageInput.value).toContain('Smart contracts')
+  }, 15000)
 })
