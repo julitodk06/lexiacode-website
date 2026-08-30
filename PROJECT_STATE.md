@@ -294,9 +294,15 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 - **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
 - **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
-### FASE 2B.2 — Poda de componentes UI no alcanzables [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+### FASE 2B.2 — Poda de componentes UI no alcanzables [✓ COMPLETADA]
 
 **Objetivo:** eliminar 53 componentes UI de `components/ui/` no importados por ninguna página activa y 2 hooks auxiliares (`hooks/use-mobile.ts`, `hooks/use-toast.ts`).
+**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
+**Resultados verificados:**
+- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
+- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$).
+- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
+- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
 ### FASE 2B.3 — Poda de assets estáticos huérfanos [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
 
@@ -354,12 +360,12 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 2B.2 — Poda de componentes UI no alcanzables**
+**FASE 2B.3 — Poda de assets estáticos huérfanos**
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B.2 — Poda de componentes UI no alcanzables” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B.3 — Poda de assets estáticos huérfanos” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
 
 Antes de modificar:
 1. Lee PROJECT_STATE.md y docs/PHASE_2A_REACHABILITY_AUDIT.md completos.
@@ -369,8 +375,9 @@ Antes de modificar:
 5. No hagas merge, deploy, force push, cambios de DNS, variables de entorno ni secretos.
 
 Implementa:
-- Eliminar los 53 componentes UI en components/ui/ no importados y 2 hooks huérfanos.
-- No eliminar assets ni dependencias en esta fase.
+- Eliminar los 28 assets estáticos huérfanos en public/ identificados en el inventario.
+- Preservar public/robots.txt y los 25 assets referenciados.
+- No modificar package.json ni dependencias en esta fase.
 
 Validación obligatoria:
 - git diff --check
@@ -383,7 +390,7 @@ Validación obligatoria:
 
 Al terminar:
 1. Muestra el diff resumido y los resultados exactos de validación.
-2. Haz un único commit con mensaje: chore: prune unreachable ui components (phase 2b.2)
+2. Haz un único commit con mensaje: chore: prune unreferenced static assets (phase 2b.3)
 3. Push únicamente a fix/public-repo-hardening.
 4. Espera y verifica el GitHub Actions run asociado.
 5. Mantén el PR #1 en Draft. No lo fusiones ni despliegues.

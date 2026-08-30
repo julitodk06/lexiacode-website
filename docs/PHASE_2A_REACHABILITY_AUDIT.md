@@ -3,22 +3,22 @@
 **Fecha de auditoría:** 2026-08-30
 **Repositorio:** `julitodk06/lexiacode-website`
 **Rama:** `fix/public-repo-hardening`
-**SHA analizado:** `3faeaf7c37e11688f701fe38b46133de6e0101a6` (Fase 2B.1 ejecutada)
-**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTE 1 (FASE 2B.1) EJECUTADO`
+**SHA analizado:** `7117ff9b09157b4edf17751dcbddf0672d8a8e18` (Fase 2B.2 ejecutada)
+**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTES 1 Y 2 (FASES 2B.1 Y 2B.2) EJECUTADOS`
 
 ---
 
 ## 1. Resumen Ejecutivo y Ecuaciones de Reconciliación
 
-Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada del **Lote 1 (FASE 2B.1 — Poda de 10 secciones landing obsoletas y CSS duplicado)**.
+Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada de los **Lotes 1 y 2 (FASE 2B.1 — Poda de 10 secciones landing obsoletas y CSS duplicado; FASE 2B.2 — Poda de 53 componentes UI no utilizados y 2 hooks huérfanos)**.
 
-> ⚠️ **Estado de Poda:** Se ejecutó exclusivamente el Lote 1 (11 archivos eliminados). Los lotes 2 (componentes UI), 3 (assets estáticos) y 4 (dependencias) permanecen **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
+> ⚠️ **Estado de Poda:** Se han ejecutado exclusivamente los Lotes 1 y 2 (66 archivos eliminados en total). Los lotes 3 (assets estáticos huérfanos) y 4 (dependencias de producción) permanecen **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
 
-### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.1)
+### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.2)
 
 1. **Módulos de Código Fuente:**
-   $$\text{sourceModulesTotal (101)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (55)}$$
-   *Verificación:* $101 = 46 + 55$ `[✓ VERIFICADO]`
+   $$\text{sourceModulesTotal (46)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (0)}$$
+   *Verificación:* $46 = 46 + 0$ `[✓ VERIFICADO]`
 
 2. **Archivos Estáticos en `public/`:**
    $$\text{totalPublicAssets (53)} = \text{referencedPublicAssets (25)} + \text{unreferencedPublicAssets (28)}$$
@@ -72,9 +72,9 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 3. Módulos de Código Fuente (`sourceModulesTotal`: 101)
+## 3. Módulos de Código Fuente (`sourceModulesTotal`: 46)
 
-### A. Módulos Alcanzables (46) — `CONSERVAR / REVISAR`
+### A. Módulos Alcanzables Activos (46) — `CONSERVAR / REVISAR`
 
 | Módulo | Tipo | Clasificación |
 |---|---|---|
@@ -101,79 +101,16 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 | `lib/translations.ts` | Diccionario ES/EN/PT | `CONSERVAR` |
 | `lib/utils.ts` | Utilidades Tailwind (`cn`) | `CONSERVAR` |
 
-### B. Módulos Eliminados en Lote 1 (11) — `[✓ ELIMINADOS EN FASE 2B.1]`
-- `components/landing/benefits.tsx`
-- `components/landing/faq-section.tsx`
-- `components/landing/featured-project.tsx`
-- `components/landing/hero.tsx`
-- `components/landing/lead-magnet-section.tsx`
-- `components/landing/pain-points.tsx`
-- `components/landing/platform-demo.tsx`
-- `components/landing/press-section.tsx`
-- `components/landing/security.tsx`
-- `components/landing/services.tsx`
-- `styles/globals.css`
+### B. Módulos Eliminados en Lotes 1 y 2 (66) — `[✓ ELIMINADOS EN FASES 2B.1 Y 2B.2]`
 
-### C. Módulos Candidatos No Alcanzables Restantes (55) — `CANDIDATOS A PODA EN FASE 2B.2`
+1. **Lote 1 — Secciones Landing Obsoletas y CSS Duplicado (11):**
+   `components/landing/benefits.tsx`, `components/landing/faq-section.tsx`, `components/landing/featured-project.tsx`, `components/landing/hero.tsx`, `components/landing/lead-magnet-section.tsx`, `components/landing/pain-points.tsx`, `components/landing/platform-demo.tsx`, `components/landing/press-section.tsx`, `components/landing/security.tsx`, `components/landing/services.tsx`, `styles/globals.css`.
 
-1. **Componentes UI de shadcn / Radix no importados (53):**
-   - `components/ui/accordion.tsx`
-   - `components/ui/alert-dialog.tsx`
-   - `components/ui/alert.tsx`
-   - `components/ui/aspect-ratio.tsx`
-   - `components/ui/avatar.tsx`
-   - `components/ui/badge.tsx`
-   - `components/ui/breadcrumb.tsx`
-   - `components/ui/button-group.tsx`
-   - `components/ui/calendar.tsx`
-   - `components/ui/carousel.tsx`
-   - `components/ui/chart.tsx`
-   - `components/ui/checkbox.tsx`
-   - `components/ui/collapsible.tsx`
-   - `components/ui/command.tsx`
-   - `components/ui/context-menu.tsx`
-   - `components/ui/dialog.tsx`
-   - `components/ui/drawer.tsx`
-   - `components/ui/empty.tsx`
-   - `components/ui/field.tsx`
-   - `components/ui/form.tsx`
-   - `components/ui/hover-card.tsx`
-   - `components/ui/input-group.tsx`
-   - `components/ui/input-otp.tsx`
-   - `components/ui/item.tsx`
-   - `components/ui/kbd.tsx`
-   - `components/ui/label.tsx`
-   - `components/ui/lead-capture-modal.tsx`
-   - `components/ui/menubar.tsx`
-   - `components/ui/navigation-menu.tsx`
-   - `components/ui/pagination.tsx`
-   - `components/ui/popover.tsx`
-   - `components/ui/progress.tsx`
-   - `components/ui/radio-group.tsx`
-   - `components/ui/resizable.tsx`
-   - `components/ui/scroll-area.tsx`
-   - `components/ui/scroll-reveal.tsx`
-   - `components/ui/select.tsx`
-   - `components/ui/separator.tsx`
-   - `components/ui/sheet.tsx`
-   - `components/ui/sidebar.tsx`
-   - `components/ui/skeleton.tsx`
-   - `components/ui/slider.tsx`
-   - `components/ui/spinner.tsx`
-   - `components/ui/switch.tsx`
-   - `components/ui/table.tsx`
-   - `components/ui/tabs.tsx`
-   - `components/ui/toast.tsx`
-   - `components/ui/toaster.tsx`
-   - `components/ui/toggle-group.tsx`
-   - `components/ui/toggle.tsx`
-   - `components/ui/tooltip.tsx`
-   - `components/ui/use-mobile.tsx`
-   - `components/ui/use-toast.ts`
+2. **Lote 2 — Componentes UI y Hooks No Alcanzables (55):**
+   `components/ui/accordion.tsx`, `components/ui/alert-dialog.tsx`, `components/ui/alert.tsx`, `components/ui/aspect-ratio.tsx`, `components/ui/avatar.tsx`, `components/ui/badge.tsx`, `components/ui/breadcrumb.tsx`, `components/ui/button-group.tsx`, `components/ui/calendar.tsx`, `components/ui/carousel.tsx`, `components/ui/chart.tsx`, `components/ui/checkbox.tsx`, `components/ui/collapsible.tsx`, `components/ui/command.tsx`, `components/ui/context-menu.tsx`, `components/ui/dialog.tsx`, `components/ui/drawer.tsx`, `components/ui/empty.tsx`, `components/ui/field.tsx`, `components/ui/form.tsx`, `components/ui/hover-card.tsx`, `components/ui/input-group.tsx`, `components/ui/input-otp.tsx`, `components/ui/item.tsx`, `components/ui/kbd.tsx`, `components/ui/label.tsx`, `components/ui/lead-capture-modal.tsx`, `components/ui/menubar.tsx`, `components/ui/navigation-menu.tsx`, `components/ui/pagination.tsx`, `components/ui/popover.tsx`, `components/ui/progress.tsx`, `components/ui/radio-group.tsx`, `components/ui/resizable.tsx`, `components/ui/scroll-area.tsx`, `components/ui/scroll-reveal.tsx`, `components/ui/select.tsx`, `components/ui/separator.tsx`, `components/ui/sheet.tsx`, `components/ui/sidebar.tsx`, `components/ui/skeleton.tsx`, `components/ui/slider.tsx`, `components/ui/spinner.tsx`, `components/ui/switch.tsx`, `components/ui/table.tsx`, `components/ui/tabs.tsx`, `components/ui/toast.tsx`, `components/ui/toaster.tsx`, `components/ui/toggle-group.tsx`, `components/ui/toggle.tsx`, `components/ui/tooltip.tsx`, `components/ui/use-mobile.tsx`, `components/ui/use-toast.ts`, `hooks/use-mobile.ts`, `hooks/use-toast.ts`.
 
-2. **Hooks Auxiliares shadcn (2):**
-   - `hooks/use-mobile.ts`
-   - `hooks/use-toast.ts`
+### C. Módulos Candidatos No Alcanzables Restantes (0)
+* Cero módulos huérfanos pendientes en el árbol de código fuente.
 
 ---
 
@@ -238,7 +175,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ### C. Auditoría Activa de Assets Inexistentes (`missingAssetRefs`)
 - **En grafo de código alcanzable:** `0 referencias rotas` `[✓ PASS]`
-- **En código no alcanzable:** `0 referencias rotas` *(las 2 referencias huérfanas en `benefits.tsx` y `platform-demo.tsx` fueron eliminadas con el Lote 1)* `[✓ PASS]`
+- **En código no alcanzable:** `0 referencias rotas` `[✓ PASS]`
 
 ---
 
@@ -275,14 +212,14 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ## 6. Limitaciones del Análisis Estático
 
-1. **Expresiones Regulares vs AST Completo:** La extracción de imports y asset references utiliza expresiones regulares deterministas que cubren imports de ES Modules (`import/export`), side-effects (`import './...'`), dynamic imports (`import('...')`) y strings en JSX/TSX/CSS. Patrones dinámicos altamente computados (`const img = '/img/' + id`) no están presentes en este proyecto pero requerirían análisis dinámico si existieran.
+1. **Expresiones Regulares vs AST Completo:** La extracción de imports y asset references utiliza expresiones regulares deterministas que cubren imports de ES Modules (`import/export`), side-effects (`import './...'`), dynamic imports (`import('...')`) y strings en JSX/TSX/CSS.
 2. **Convenciones de Next.js:** Los entrypoints del App Router se resuelven por nombres de archivo reservados (`page`, `layout`, `sitemap`, etc.). Archivos como `app/faq/layout.tsx` se consideran alcanzables por diseño del framework aunque no tengan imports explícitos.
 
 ---
 
 ## 7. Plan de Lotes Restantes de la FASE 2B
 
-* **Lote 1 (FASE 2B.1):** `[✓ COMPLETADO]` Eliminación de 10 secciones landing obsoletas y `styles/globals.css` (11 módulos fuente eliminados).
-* **Lote 2 (FASE 2B.2):** `[⏳ Pendiente]` Eliminación de 53 componentes UI no alcanzables y 2 hooks huérfanos.
-* **Lote 3 (FASE 2B.3):** `[⏳ Pendiente]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
-* **Lote 4 (FASE 2B.4):** `[⏳ Pendiente]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
+* **Lote 1 (FASE 2B.1):** `[✓ COMPLETADO]` Eliminación de 10 secciones landing obsoletas y `styles/globals.css` (11 módulos eliminados).
+* **Lote 2 (FASE 2B.2):** `[✓ COMPLETADO]` Eliminación de 53 componentes UI no alcanzables y 2 hooks huérfanos (55 módulos eliminados).
+* **Lote 3 (FASE 2B.3):** `[⏳ Pendiente de Autorización]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
+* **Lote 4 (FASE 2B.4):** `[⏳ Pendiente de Autorización]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
