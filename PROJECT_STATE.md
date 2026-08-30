@@ -314,11 +314,30 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 - **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
 - **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
-### FASE 2B.4 — Poda de dependencias no utilizadas [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+### FASE 2B.4 — Poda de dependencias no utilizadas [✓ COMPLETADA]
 
 **Objetivo:** desinstalar 37 dependencias de producción no utilizadas en `package.json` y regenerar `package-lock.json`.
+**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
+**Resultados verificados:**
+- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
+- **Archivos estáticos en `public/` (25):** 25 referenciados + 0 candidatos no referenciados ($25 = 25 + 0$).
+- **Dependencias de producción (12):** 10 directamente importadas + 2 indirectamente requeridas + 0 candidatas a poda ($12 = 10 + 2 + 0$).
+- **Paquetes auditados:** Reducción de 506 paquetes iniciales a 413 paquetes en el árbol de dependencias.
+- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
-### FASE 3 — Cobertura automatizada mínima
+---
+
+## RESUMEN GLOBAL DE LA FASE 2B: PODA SEGURA [✓ COMPLETADA]
+
+* **Lote 1 (FASE 2B.1):** 11 módulos eliminados (10 secciones landing obsoletas + `styles/globals.css`).
+* **Lote 2 (FASE 2B.2):** 55 módulos eliminados (53 componentes UI no utilizados + 2 hooks huérfanos).
+* **Lote 3 (FASE 2B.3):** 28 assets estáticos huérfanos eliminados en `public/` (conservando `robots.txt` y 25 activos).
+* **Lote 4 (FASE 2B.4):** 37 dependencias no utilizadas desinstaladas de `package.json`.
+* **Reducción de código:** 66 módulos fuente eliminados, 28 assets eliminados, 37 dependencias de producción eliminadas, 93 paquetes npm reducidos.
+
+---
+
+### FASE 3 — Cobertura automatizada mínima [⏳ EN CURSO / AUTORIZADA]
 
 **Objetivo:** detectar regresiones funcionales antes del merge.
 
@@ -366,7 +385,7 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 2B.4 — Poda de dependencias no utilizadas**
+**FASE 3 — Cobertura automatizada mínima**
 
 ## Prompt exacto para iniciar la primera tarea
 

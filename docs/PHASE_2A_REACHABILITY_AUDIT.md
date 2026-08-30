@@ -3,18 +3,18 @@
 **Fecha de auditoría:** 2026-08-30
 **Repositorio:** `julitodk06/lexiacode-website`
 **Rama:** `fix/public-repo-hardening`
-**SHA analizado:** `e114ece110b161a0fc9f811ea8bc985a1f378bf5` (Fase 2B.3 ejecutada)
-**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTES 1, 2 Y 3 (FASES 2B.1, 2B.2 Y 2B.3) EJECUTADOS`
+**SHA analizado:** `25855d0` (Fase 2B.4 ejecutada)
+**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — FASE 2B COMPLETADA (TODOS LOS LOTES 1, 2, 3 Y 4 EJECUTADOS)`
 
 ---
 
 ## 1. Resumen Ejecutivo y Ecuaciones de Reconciliación
 
-Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada de los **Lotes 1, 2 y 3 (FASE 2B.1 — Secciones landing; FASE 2B.2 — Componentes UI y hooks; FASE 2B.3 — Poda de 28 assets estáticos huérfanos en `public/`)**.
+Este documento establece el inventario final exacto y formalmente reconciliado tras la ejecución completa de la **FASE 2B (Poda segura de secciones landing obsoletas, componentes UI no alcanzables, assets estáticos huérfanos y dependencias no utilizadas)**.
 
-> ⚠️ **Estado de Poda:** Se han ejecutado los Lotes 1, 2 y 3. El Lote 4 (dependencias de producción) permanece **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
+> ⚠️ **Estado de Poda:** La Fase 2B ha concluido exitosamente en sus 4 lotes. No quedan módulos de código muerto, assets huérfanos ni dependencias no utilizadas.
 
-### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.3)
+### Ecuaciones de Reconciliación Finales (Post Fase 2B.4)
 
 1. **Módulos de Código Fuente:**
    $$\text{sourceModulesTotal (46)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (0)}$$
@@ -25,8 +25,8 @@ Este documento establece el inventario exacto y formalmente reconciliado de mód
    *Verificación:* $25 = 25 + 0$ `[✓ VERIFICADO]`
 
 3. **Dependencias de Producción en `package.json`:**
-   $$\text{declaredProductionDependencies (49)} = \text{directlyImported (10)} + \text{indirectlyRequired (2)} + \text{unreferencedCandidates (37)}$$
-   *Verificación:* $49 = 10 + 2 + 37$ `[✓ VERIFICADO]`
+   $$\text{declaredProductionDependencies (12)} = \text{directlyImported (10)} + \text{indirectlyRequired (2)} + \text{unreferencedCandidates (0)}$$
+   *Verificación:* $12 = 10 + 2 + 0$ `[✓ VERIFICADO]`
 
 ---
 
@@ -155,7 +155,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 5. Matriz de Dependencias (`package.json` — Total: 49)
+## 5. Matriz de Dependencias (`package.json` — Total: 12)
 
 ### A. Dependencias en Uso Directo (10) — `CONSERVAR`
 - `@radix-ui/react-dropdown-menu`
@@ -173,16 +173,11 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 - `react-dom` *(Peer dependency esencial para React 19 y Next.js)*
 - `autoprefixer` *(Plugin de PostCSS requerido por el build pipeline)*
 
-### C. Dependencias Candidatas a Poda (37) — `A EVALUAR EN FASE 2B.4`
+### C. Dependencias Eliminadas en Lote 4 (37) — `[✓ ELIMINADAS EN FASE 2B.4]`
+`@hookform/resolvers`, `@vercel/analytics`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-aspect-ratio`, `@radix-ui/react-avatar`, `@radix-ui/react-checkbox`, `@radix-ui/react-collapsible`, `@radix-ui/react-context-menu`, `@radix-ui/react-dialog`, `@radix-ui/react-hover-card`, `@radix-ui/react-label`, `@radix-ui/react-menubar`, `@radix-ui/react-navigation-menu`, `@radix-ui/react-popover`, `@radix-ui/react-progress`, `@radix-ui/react-radio-group`, `@radix-ui/react-scroll-area`, `@radix-ui/react-select`, `@radix-ui/react-separator`, `@radix-ui/react-slider`, `@radix-ui/react-switch`, `@radix-ui/react-tabs`, `@radix-ui/react-toast`, `@radix-ui/react-toggle`, `@radix-ui/react-toggle-group`, `@radix-ui/react-tooltip`, `cmdk`, `date-fns`, `embla-carousel-react`, `input-otp`, `react-day-picker`, `react-hook-form`, `react-resizable-panels`, `recharts`, `vaul`, `zod`.
 
-* **Paquetes Radix UI no importados (25):**
-  `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-aspect-ratio`, `@radix-ui/react-avatar`, `@radix-ui/react-checkbox`, `@radix-ui/react-collapsible`, `@radix-ui/react-context-menu`, `@radix-ui/react-dialog`, `@radix-ui/react-hover-card`, `@radix-ui/react-label`, `@radix-ui/react-menubar`, `@radix-ui/react-navigation-menu`, `@radix-ui/react-popover`, `@radix-ui/react-progress`, `@radix-ui/react-radio-group`, `@radix-ui/react-scroll-area`, `@radix-ui/react-select`, `@radix-ui/react-separator`, `@radix-ui/react-slider`, `@radix-ui/react-switch`, `@radix-ui/react-tabs`, `@radix-ui/react-toast`, `@radix-ui/react-toggle`, `@radix-ui/react-toggle-group`, `@radix-ui/react-tooltip`.
-* **Librerías de UI complejas sin uso (8):**
-  `cmdk`, `date-fns`, `embla-carousel-react`, `input-otp`, `react-day-picker`, `react-resizable-panels`, `recharts`, `vaul`.
-* **Validación y Formularios no utilizados (3):**
-  `@hookform/resolvers`, `react-hook-form`, `zod`.
-* **Telemetría no configurada (1):**
-  `@vercel/analytics`.
+### D. Dependencias Candidatas a Poda Restantes (0)
+* Cero dependencias no utilizadas en `package.json`.
 
 ---
 
@@ -193,9 +188,9 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 7. Plan de Lotes Restantes de la FASE 2B
+## 7. Plan de Lotes de la FASE 2B (Completada)
 
 * **Lote 1 (FASE 2B.1):** `[✓ COMPLETADO]` Eliminación de 10 secciones landing obsoletas y `styles/globals.css` (11 módulos eliminados).
 * **Lote 2 (FASE 2B.2):** `[✓ COMPLETADO]` Eliminación de 53 componentes UI no alcanzables y 2 hooks huérfanos (55 módulos eliminados).
 * **Lote 3 (FASE 2B.3):** `[✓ COMPLETADO]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
-* **Lote 4 (FASE 2B.4):** `[⏳ Pendiente de Autorización]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
+* **Lote 4 (FASE 2B.4):** `[✓ COMPLETADO]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
