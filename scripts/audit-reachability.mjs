@@ -6,8 +6,32 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const rootDir = path.resolve(__dirname, '..')
 
-const EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.json', '.css']
 const SOURCE_DIRS = ['app', 'components', 'hooks', 'lib', 'styles']
+const CODE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.json', '.css']
+const ASSET_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.gif', '.mp4', '.pdf', '.txt', '.xml', '.json']
+
+const NEXT_SPECIAL_FILENAMES = new Set([
+  'page',
+  'layout',
+  'template',
+  'loading',
+  'error',
+  'global-error',
+  'not-found',
+  'default',
+  'route',
+  'sitemap',
+  'robots',
+  'manifest',
+  'icon',
+  'apple-icon',
+  'opengraph-image',
+  'twitter-image'
+])
+
+function normalizePath(p) {
+  return p.split(path.sep).join('/')
+}
 
 function getAllFiles(dirPath, arrayOfFiles = []) {
   if (!fs.existsSync(dirPath)) return arrayOfFiles
@@ -25,10 +49,6 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
   return arrayOfFiles
 }
 
-function normalizePath(p) {
-  return p.split(path.sep).join('/')
-}
-
 function resolveImport(importSpecifier, fromFile) {
   if (importSpecifier.startsWith('@/')) {
     const relativePart = importSpecifier.slice(2)
@@ -41,19 +61,19 @@ function resolveImport(importSpecifier, fromFile) {
     return tryResolveFile(basePath)
   }
 
-  return null // External package or unhandled
+  return null
 }
 
 function tryResolveFile(basePath) {
   if (fs.existsSync(basePath) && fs.statSync(basePath).isFile()) {
     return basePath
   }
-  for (const ext of EXTENSIONS) {
+  for (const ext of CODE_EXTENSIONS) {
     if (fs.existsSync(basePath + ext)) {
       return basePath + ext
     }
   }
-  for (const ext of EXTENSIONS) {
+  for (const ext of CODE_EXTENSIONS) {
     const indexFile = path.join(basePath, 'index' + ext)
     if (fs.existsSync(indexFile)) {
       return indexFile
@@ -65,8 +85,8 @@ function tryResolveFile(basePath) {
 function extractImports(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
   const imports = []
-  
-  // Side-effect imports: import './globals.css' or import "styles.css"
+
+  // Side-effect imports: import './globals.css'
   const sideEffectRegex = /import\s+['"]([^'"]+)['"]/g
   let match
   while ((match = sideEffectRegex.exec(content)) !== null) {
@@ -88,48 +108,67 @@ function extractImports(filePath) {
   return { content, imports: Array.from(new Set(imports)) }
 }
 
-console.log('=== LexiaCode Reachability & Dependency Auditor ===\n')
+function extractAssetReferences(content) {
+  const refs = []
 
-// 1. Gather all source files
-const sourceFiles = []
+  // Match string literals
+  const stringRegex = /['"`]([^'"`\r\n]+)['"`]/g
+  let match
+  while ((match = stringRegex.exec(content)) !== null) {
+    refs.push(match[1])
+  }
+
+  // Match CSS url(...)
+  const urlRegex = /url\(\s*['"]?([^'")]+)['"]?\s*\)/g
+  while ((match = urlRegex.exec(content)) !== null) {
+    refs.push(match[1])
+  }
+
+  return refs
+}
+
+console.log('=== LexiaCode Reachability & Dependency Auditor (v2.1) ===\n')
+
+// 1. Collect Source Modules
+const sourceFilesRaw = []
 for (const dir of SOURCE_DIRS) {
   const fullDirPath = path.join(rootDir, dir)
-  getAllFiles(fullDirPath, sourceFiles)
+  getAllFiles(fullDirPath, sourceFilesRaw)
 }
 
-const allModulesNormalized = new Set(sourceFiles.map(f => normalizePath(path.relative(rootDir, f))))
+const sourceModulesSet = new Set(sourceFilesRaw.map(f => normalizePath(path.relative(rootDir, f))))
+const sourceModulesTotal = sourceModulesSet.size
 
-// 2. Identify entrypoints
-const entrypoints = []
-for (const relPath of allModulesNormalized) {
-  if (relPath.startsWith('app/') && (relPath.endsWith('/page.tsx') || relPath.endsWith('/page.ts') || relPath.endsWith('/page.jsx') || relPath.endsWith('/page.js'))) {
-    entrypoints.push(relPath)
-  } else if (relPath === 'app/layout.tsx' || relPath === 'app/layout.js' || relPath === 'app/sitemap.ts' || relPath === 'app/robots.ts' || relPath === 'app/not-found.tsx') {
-    entrypoints.push(relPath)
+// 2. Identify Framework Entrypoints in app/
+const frameworkEntrypoints = []
+for (const relPath of sourceModulesSet) {
+  if (relPath.startsWith('app/')) {
+    const filenameWithoutExt = path.basename(relPath, path.extname(relPath))
+    if (NEXT_SPECIAL_FILENAMES.has(filenameWithoutExt)) {
+      frameworkEntrypoints.push(relPath)
+    }
   }
 }
+frameworkEntrypoints.sort()
 
-// Config files as entrypoints
-const configFiles = ['next.config.mjs', 'postcss.config.mjs', 'eslint.config.mjs', 'components.json']
-for (const cfg of configFiles) {
-  if (fs.existsSync(path.join(rootDir, cfg))) {
-    entrypoints.push(cfg)
-  }
-}
+// 3. Identify Config Entrypoints (Root configs outside source dirs)
+const configFilesList = ['next.config.mjs', 'postcss.config.mjs', 'eslint.config.mjs', 'components.json']
+const configEntrypoints = configFilesList.filter(cfg => fs.existsSync(path.join(rootDir, cfg)))
 
-console.log(`Identified ${entrypoints.length} entrypoints:`)
-entrypoints.forEach(e => console.log(`  - ${e}`))
+console.log(`Framework Entrypoints en app/ (${frameworkEntrypoints.length}):`)
+frameworkEntrypoints.forEach(e => console.log(`  - ${e}`))
 
-// 3. Traverse reachable graph
-const reachable = new Set()
-const queue = [...entrypoints.map(e => path.join(rootDir, e))]
+console.log(`\nConfig Entrypoints en raíz (${configEntrypoints.length}):`)
+configEntrypoints.forEach(e => console.log(`  - ${e}`))
+
+// 4. Graph Traversal for Reachable Source Modules
+const reachableSourceModules = new Set()
+const queue = [...frameworkEntrypoints.map(e => path.join(rootDir, e)), ...configEntrypoints.map(e => path.join(rootDir, e))]
 const brokenImports = []
 const importedPackages = new Set()
 
-for (const ep of queue) {
-  if (fs.existsSync(ep)) {
-    reachable.add(normalizePath(path.relative(rootDir, ep)))
-  }
+for (const ep of frameworkEntrypoints) {
+  reachableSourceModules.add(ep)
 }
 
 while (queue.length > 0) {
@@ -145,11 +184,17 @@ while (queue.length > 0) {
     if (spec.startsWith('@/') || spec.startsWith('./') || spec.startsWith('../')) {
       const resolved = resolveImport(spec, currentFile)
       if (resolved && resolved.startsWith('MISSING:')) {
-        brokenImports.push({ from: normalizePath(path.relative(rootDir, currentFile)), spec, missing: resolved.replace('MISSING:', '') })
+        brokenImports.push({
+          from: normalizePath(path.relative(rootDir, currentFile)),
+          spec,
+          missing: resolved.replace('MISSING:', '')
+        })
       } else if (resolved) {
         const norm = normalizePath(path.relative(rootDir, resolved))
-        if (!reachable.has(norm)) {
-          reachable.add(norm)
+        if (sourceModulesSet.has(norm) && !reachableSourceModules.has(norm)) {
+          reachableSourceModules.add(norm)
+          queue.push(resolved)
+        } else if (!sourceModulesSet.has(norm) && fs.existsSync(resolved)) {
           queue.push(resolved)
         }
       }
@@ -157,7 +202,7 @@ while (queue.length > 0) {
       let pkg = spec
       if (spec.startsWith('@')) {
         const parts = spec.split('/')
-        pkg = parts[0] + '/' + parts[1]
+        pkg = parts[0] + '/' + (parts[1] || '')
       } else {
         pkg = spec.split('/')[0]
       }
@@ -166,130 +211,210 @@ while (queue.length > 0) {
   }
 }
 
-const unreachableModules = []
-for (const mod of allModulesNormalized) {
-  if (!reachable.has(mod)) {
-    unreachableModules.push(mod)
+const unreachableSourceModules = []
+for (const mod of sourceModulesSet) {
+  if (!reachableSourceModules.has(mod)) {
+    unreachableSourceModules.push(mod)
   }
 }
+unreachableSourceModules.sort()
 
-console.log(`\nModules Summary:`)
-console.log(`  Total Modules: ${allModulesNormalized.size}`)
-console.log(`  Reachable Modules: ${reachable.size}`)
-console.log(`  Unreachable Candidates: ${unreachableModules.length}`)
+// Reconciliation Equation 1: sourceModulesTotal = reachableSourceModules + unreachableSourceModules
+const moduleCountMatches = sourceModulesTotal === (reachableSourceModules.size + unreachableSourceModules.length)
 
-// 4. Asset Analysis in public/
+console.log(`\n--- Reconciliación de Módulos de Código Fuente ---`)
+console.log(`  sourceModulesTotal: ${sourceModulesTotal}`)
+console.log(`  reachableSourceModules: ${reachableSourceModules.size}`)
+console.log(`  unreachableSourceModules: ${unreachableSourceModules.length}`)
+console.log(`  Ecuación: ${sourceModulesTotal} = ${reachableSourceModules.size} + ${unreachableSourceModules.length} -> ${moduleCountMatches ? 'VERIFICADA [✓]' : 'ERROR [X]'}`)
+
+// 5. Public Assets Reachability & Active Missing Asset Detection
 const publicDir = path.join(rootDir, 'public')
-const allPublicAssets = getAllFiles(publicDir).map(f => normalizePath(path.relative(rootDir, f)))
-const allSourceCode = sourceFiles.concat(configFiles.map(c => path.join(rootDir, c))).filter(f => fs.existsSync(f))
+const publicFilesRaw = getAllFiles(publicDir)
+const allPublicAssetsSet = new Set(publicFilesRaw.map(f => normalizePath(path.relative(rootDir, f))))
+const totalPublicAssets = allPublicAssetsSet.size
 
-const referencedAssets = new Set()
-const missingAssetRefs = []
+const reachableFilesToScan = Array.from(reachableSourceModules).map(f => path.join(rootDir, f)).concat(configEntrypoints.map(c => path.join(rootDir, c)))
+const unreachableFilesToScan = unreachableSourceModules.map(f => path.join(rootDir, f))
 
-// Extract all string literals from source files to check for asset references
-for (const file of allSourceCode) {
-  const content = fs.readFileSync(file, 'utf-8')
-  for (const asset of allPublicAssets) {
-    const assetRelToPublic = asset.replace(/^public\//, '')
-    const exactRef = '/' + assetRelToPublic
+const referencedPublicAssets = new Set()
+const missingReachableAssetRefs = []
+const missingUnreachableAssetRefs = []
+const inspectedRefs = new Set()
 
-    if (content.includes(exactRef) || content.includes(assetRelToPublic)) {
-      referencedAssets.add(asset)
+// robots.txt is a direct framework/public entrypoint
+if (allPublicAssetsSet.has('public/robots.txt')) {
+  referencedPublicAssets.add('public/robots.txt')
+}
+
+// Check reachable files
+for (const filePath of reachableFilesToScan) {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const rawRefs = extractAssetReferences(content)
+
+  for (let ref of rawRefs) {
+    ref = ref.split('?')[0].split('#')[0].trim()
+    if (!ref) continue
+    if (/^(https?:|data:|blob:|mailto:|tel:|\/\/|#)/i.test(ref)) continue
+
+    const ext = path.extname(ref).toLowerCase()
+    if (!ASSET_EXTENSIONS.includes(ext)) continue
+
+    const refKey = `${normalizePath(path.relative(rootDir, filePath))} -> ${ref}`
+    if (inspectedRefs.has(refKey)) continue
+    inspectedRefs.add(refKey)
+
+    let potentialAssetRelPath = ref
+    if (potentialAssetRelPath.startsWith('/')) {
+      potentialAssetRelPath = potentialAssetRelPath.slice(1)
+    }
+    potentialAssetRelPath = 'public/' + potentialAssetRelPath
+
+    if (allPublicAssetsSet.has(potentialAssetRelPath)) {
+      referencedPublicAssets.add(potentialAssetRelPath)
+    } else {
+      if (ref.startsWith('/') || ref.startsWith('./') || ref.startsWith('../') || potentialAssetRelPath.startsWith('public/')) {
+        missingReachableAssetRefs.push({
+          from: normalizePath(path.relative(rootDir, filePath)),
+          reference: ref,
+          expectedFile: potentialAssetRelPath
+        })
+      }
     }
   }
 }
 
-const unreferencedAssets = []
-for (const asset of allPublicAssets) {
-  if (!referencedAssets.has(asset)) {
-    unreferencedAssets.push(asset)
+// Check unreachable files (for informational reporting)
+for (const filePath of unreachableFilesToScan) {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const rawRefs = extractAssetReferences(content)
+
+  for (let ref of rawRefs) {
+    ref = ref.split('?')[0].split('#')[0].trim()
+    if (!ref) continue
+    if (/^(https?:|data:|blob:|mailto:|tel:|\/\/|#)/i.test(ref)) continue
+
+    const ext = path.extname(ref).toLowerCase()
+    if (!ASSET_EXTENSIONS.includes(ext)) continue
+
+    let potentialAssetRelPath = ref
+    if (potentialAssetRelPath.startsWith('/')) {
+      potentialAssetRelPath = potentialAssetRelPath.slice(1)
+    }
+    potentialAssetRelPath = 'public/' + potentialAssetRelPath
+
+    if (!allPublicAssetsSet.has(potentialAssetRelPath)) {
+      if (ref.startsWith('/') || ref.startsWith('./') || ref.startsWith('../') || potentialAssetRelPath.startsWith('public/')) {
+        missingUnreachableAssetRefs.push({
+          from: normalizePath(path.relative(rootDir, filePath)),
+          reference: ref,
+          expectedFile: potentialAssetRelPath
+        })
+      }
+    }
   }
 }
 
-console.log(`\nAssets Summary:`)
-console.log(`  Total Public Assets: ${allPublicAssets.length}`)
-console.log(`  Referenced Assets: ${referencedAssets.size}`)
-console.log(`  Unreferenced Candidates: ${unreferencedAssets.length}`)
+const unreferencedPublicAssets = []
+for (const asset of allPublicAssetsSet) {
+  if (!referencedPublicAssets.has(asset)) {
+    unreferencedPublicAssets.push(asset)
+  }
+}
+unreferencedPublicAssets.sort()
 
-// 5. Dependency Analysis
+// Reconciliation Equation 2: totalPublicAssets = referencedPublicAssets + unreferencedPublicAssets
+const assetCountMatches = totalPublicAssets === (referencedPublicAssets.size + unreferencedPublicAssets.length)
+
+console.log(`\n--- Reconciliación de Archivos Estáticos (public/) ---`)
+console.log(`  totalPublicAssets: ${totalPublicAssets}`)
+console.log(`  referencedPublicAssets: ${referencedPublicAssets.size}`)
+console.log(`  unreferencedPublicAssets: ${unreferencedPublicAssets.length}`)
+console.log(`  Ecuación: ${totalPublicAssets} = ${referencedPublicAssets.size} + ${unreferencedPublicAssets.length} -> ${assetCountMatches ? 'VERIFICADA [✓]' : 'ERROR [X]'}`)
+
+// 6. Dependencies Breakdown
 const pkgJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8'))
-const declaredDependencies = Object.keys(pkgJson.dependencies || {})
-const declaredDevDependencies = Object.keys(pkgJson.devDependencies || {})
+const declaredProductionDependencies = Object.keys(pkgJson.dependencies || {})
 
-// Known indirect / framework / config dependencies
 const knownIndirectDependencies = new Set([
-  'react-dom', // required peer for react/next
-  'next',
-  'react',
-  'autoprefixer',
-  'postcss',
-  'tailwindcss',
-  '@tailwindcss/postcss',
-  'tw-animate-css',
-  'typescript',
-  '@types/node',
-  '@types/react',
-  '@types/react-dom',
-  'eslint',
-  'eslint-config-next',
-  '@eslint/eslintrc'
+  'react-dom',
+  'autoprefixer'
 ])
 
 const directlyImported = []
 const indirectlyRequired = []
-const unreferencedPackages = []
+const unreferencedCandidates = []
 
-for (const dep of declaredDependencies) {
+for (const dep of declaredProductionDependencies) {
   if (importedPackages.has(dep)) {
     directlyImported.push(dep)
   } else if (knownIndirectDependencies.has(dep)) {
     indirectlyRequired.push(dep)
   } else {
-    unreferencedPackages.push(dep)
+    unreferencedCandidates.push(dep)
   }
 }
+directlyImported.sort()
+indirectlyRequired.sort()
+unreferencedCandidates.sort()
 
-console.log(`\nDependencies Summary:`)
-console.log(`  Declared Production Dependencies: ${declaredDependencies.length}`)
-console.log(`  Directly Imported: ${directlyImported.length}`)
-console.log(`  Indirectly Required: ${indirectlyRequired.length}`)
-console.log(`  Unreferenced Candidates: ${unreferencedPackages.length}`)
+// Reconciliation Equation 3: declaredProductionDependencies = directlyImported + indirectlyRequired + unreferencedCandidates
+const depCountMatches = declaredProductionDependencies.length === (directlyImported.length + indirectlyRequired.length + unreferencedCandidates.length)
 
-// 6. Detailed output if --verbose or --json
+console.log(`\n--- Reconciliación de Dependencias de Producción ---`)
+console.log(`  declaredProductionDependencies: ${declaredProductionDependencies.length}`)
+console.log(`  directlyImported: ${directlyImported.length}`)
+console.log(`  indirectlyRequired: ${indirectlyRequired.length}`)
+console.log(`  unreferencedCandidates: ${unreferencedCandidates.length}`)
+console.log(`  Ecuación: ${declaredProductionDependencies.length} = ${directlyImported.length} + ${indirectlyRequired.length} + ${unreferencedCandidates.length} -> ${depCountMatches ? 'VERIFICADA [✓]' : 'ERROR [X]'}`)
+
+// 7. Error Evaluation & Exit Code
+let exitCode = 0
+
+if (!moduleCountMatches || !assetCountMatches || !depCountMatches) {
+  console.error('\n[ERROR] Falla de reconciliación en totales.')
+  exitCode = 1
+}
+
+if (brokenImports.length > 0) {
+  console.error(`\n[ERROR] Se encontraron ${brokenImports.length} imports locales rotos:`)
+  brokenImports.forEach(b => console.error(`  - ${b.from} importa '${b.spec}' -> no encontrado en ${b.missing}`))
+  exitCode = 1
+}
+
+if (missingReachableAssetRefs.length > 0) {
+  console.error(`\n[ERROR] Se encontraron ${missingReachableAssetRefs.length} referencias a assets inexistentes en código alcanzable:`)
+  missingReachableAssetRefs.forEach(m => console.error(`  - ${m.from} referencia '${m.reference}' -> archivo esperado no existe: ${m.expectedFile}`))
+  exitCode = 1
+}
+
+if (missingUnreachableAssetRefs.length > 0) {
+  console.log(`\n[INFO] Referencias a assets inexistentes en código NO alcanzable (${missingUnreachableAssetRefs.length}):`)
+  missingUnreachableAssetRefs.forEach(m => console.log(`  - [Código Muerto] ${m.from} referencia '${m.reference}' (no existe ${m.expectedFile})`))
+}
+
 if (process.argv.includes('--json')) {
-  const result = {
-    totalModules: allModulesNormalized.size,
-    reachableModules: reachable.size,
-    unreachableModules,
-    entrypoints,
-    totalPublicAssets: allPublicAssets.length,
-    referencedAssets: Array.from(referencedAssets),
-    unreferencedAssets,
-    declaredDependenciesCount: declaredDependencies.length,
+  const report = {
+    sourceModulesTotal,
+    reachableSourceModules: Array.from(reachableSourceModules).sort(),
+    unreachableSourceModules,
+    frameworkEntrypoints,
+    configEntrypoints,
+    totalPublicAssets,
+    referencedPublicAssets: Array.from(referencedPublicAssets).sort(),
+    unreferencedPublicAssets,
+    missingReachableAssetRefs,
+    missingUnreachableAssetRefs,
+    declaredProductionDependencies: declaredProductionDependencies.length,
     directlyImported,
     indirectlyRequired,
-    unreferencedPackages
+    unreferencedCandidates
   }
-  fs.writeFileSync(path.join(rootDir, '.reachability-report.json'), JSON.stringify(result, null, 2))
-  console.log('Saved .reachability-report.json')
-}
-
-// 7. Validation Errors Check
-let exitCode = 0
-if (brokenImports.length > 0) {
-  console.error(`\n[ERROR] Found ${brokenImports.length} broken local imports:`)
-  brokenImports.forEach(b => console.error(`  - ${b.from} imports '${b.spec}' -> ${b.missing}`))
-  exitCode = 1
-}
-
-if (missingAssetRefs.length > 0) {
-  console.error(`\n[ERROR] Found ${missingAssetRefs.length} missing asset references:`)
-  missingAssetRefs.forEach(m => console.error(`  - ${m}`))
-  exitCode = 1
+  fs.writeFileSync(path.join(rootDir, '.reachability-report.json'), JSON.stringify(report, null, 2))
 }
 
 if (exitCode === 0) {
-  console.log('\n[PASS] 0 broken imports, 0 missing referenced assets.')
+  console.log('\n[PASS] Cero imports rotos, cero referencias a assets inexistentes en código alcanzable, todas las ecuaciones reconciliadas.')
 }
 
 process.exit(exitCode)

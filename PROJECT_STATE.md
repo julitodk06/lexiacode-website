@@ -274,17 +274,17 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 - `npm audit --audit-level=high`: Código 0 (0 vulnerabilidades).
 - CI Run 33289008319 en GitHub Actions: Exitoso (verde).
 
-### FASE 2A — Inventario reproducible de código, assets y dependencias [✓ COMPLETADA]
+### FASE 2A / 2A.1 — Inventario reproducible y reconciliado de código, assets y dependencias [✓ COMPLETADA]
 
-**Objetivo:** construir un inventario auditable y determinista sin modificar el código ni eliminar archivos.
+**Objetivo:** construir un inventario auditable, determinista y matemáticamente reconciliado sin modificar el código ni eliminar archivos.
 **Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md` y `scripts/audit-reachability.mjs`.
-**Resultados verificados:**
-- 112 módulos totales (49 alcanzables, 67 candidatos no alcanzables).
-- 53 assets estáticos (28 referenciados, 25 candidatos no referenciados).
-- 49 dependencias declaradas (10 directamente importadas, 2 indirectas, 37 candidatas a poda).
-- 0 imports locales rotos, 0 assets referenciados inexistentes.
+**Resultados reconciliados verificados:**
+- **Módulos de código fuente (112):** 46 alcanzables + 66 candidatos no alcanzables ($112 = 46 + 66$).
+- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$). `public/robots.txt` clasificado como entrypoint público `CONSERVAR`.
+- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas (`react-dom`, `autoprefixer`) + 37 candidatas a poda ($49 = 10 + 2 + 37$).
+- **Auditoría de integridad:** 0 imports locales rotos, 0 referencias a assets inexistentes en código alcanzable.
 
-### FASE 2B — Poda segura de código, assets y dependencias [⏳ Pendiente de Autorización]
+### FASE 2B — Poda segura de código, assets y dependencias [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
 
 **Objetivo:** reducir superficie y peso eliminando código muerto, assets huérfanos y dependencias no utilizadas en lotes pequeños, sin alterar rutas ni apariencia pública.
 
