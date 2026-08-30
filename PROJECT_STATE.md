@@ -284,17 +284,27 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 - **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas (`react-dom`, `autoprefixer`) + 37 candidatas a poda ($49 = 10 + 2 + 37$).
 - **Auditoría de integridad:** 0 imports locales rotos, 0 referencias a assets inexistentes en código alcanzable.
 
-### FASE 2B — Poda segura de código, assets y dependencias [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+### FASE 2B.1 — Poda de secciones landing obsoletas [✓ COMPLETADA]
 
-**Objetivo:** reducir superficie y peso eliminando código muerto, assets huérfanos y dependencias no utilizadas en lotes pequeños, sin alterar rutas ni apariencia pública.
+**Objetivo:** eliminar los primeros 11 módulos huérfanos confirmados (10 secciones landing obsoletas y `styles/globals.css`).
+**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
+**Resultados verificados:**
+- **Módulos de código fuente (101):** 46 alcanzables + 55 candidatos no alcanzables ($101 = 46 + 55$).
+- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$).
+- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
+- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
-1. Lote 1: Eliminar secciones obsoletas de `components/landing/` y CSS duplicado.
-2. Lote 2: Eliminar componentes UI no utilizados en `components/ui/`.
-3. Lote 3: Eliminar assets huérfanos en `public/` (preservando `robots.txt` y assets activos).
-4. Lote 4: Podar dependencias en `package.json` y regenerar lockfile.
-5. Verificar build y comparar visualmente las rutas críticas.
+### FASE 2B.2 — Poda de componentes UI no alcanzables [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
 
-**Aceptación:** cero imports rotos, cero assets 404, 28 rutas estáticas conservadas, CI verde y reducción documentada de módulos/paquetes.
+**Objetivo:** eliminar 53 componentes UI de `components/ui/` no importados por ninguna página activa y 2 hooks auxiliares (`hooks/use-mobile.ts`, `hooks/use-toast.ts`).
+
+### FASE 2B.3 — Poda de assets estáticos huérfanos [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+
+**Objetivo:** eliminar 28 assets estáticos huérfanos en `public/` conservando `robots.txt` y los 25 assets activos.
+
+### FASE 2B.4 — Poda de dependencias no utilizadas [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+
+**Objetivo:** desinstalar 37 dependencias de producción no utilizadas en `package.json` y regenerar `package-lock.json`.
 
 ### FASE 3 — Cobertura automatizada mínima
 
@@ -344,12 +354,12 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 2B — Poda segura de código, assets y dependencias**
+**FASE 2B.2 — Poda de componentes UI no alcanzables**
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B — Poda segura de código, assets y dependencias” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B.2 — Poda de componentes UI no alcanzables” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
 
 Antes de modificar:
 1. Lee PROJECT_STATE.md y docs/PHASE_2A_REACHABILITY_AUDIT.md completos.
@@ -358,13 +368,11 @@ Antes de modificar:
 4. No trabajes sobre main y no crees otra rama.
 5. No hagas merge, deploy, force push, cambios de DNS, variables de entorno ni secretos.
 
-Implementa en lotes pequeños:
-- Lote 1: Eliminar secciones landing obsoletas y styles/globals.css.
-- Lote 2: Eliminar componentes UI no utilizados.
-- Lote 3: Eliminar 24 assets estáticos huérfanos (conservando robots.txt).
-- Lote 4: Podar dependencias no utilizadas en package.json y regenerar package-lock.json.
+Implementa:
+- Eliminar los 53 componentes UI en components/ui/ no importados y 2 hooks huérfanos.
+- No eliminar assets ni dependencias en esta fase.
 
-Validación obligatoria tras cada lote:
+Validación obligatoria:
 - git diff --check
 - npm ci
 - npm run audit:reachability
@@ -375,7 +383,7 @@ Validación obligatoria tras cada lote:
 
 Al terminar:
 1. Muestra el diff resumido y los resultados exactos de validación.
-2. Haz un único commit con mensaje: chore: prune dead code, unused assets and dependencies (phase 2b)
+2. Haz un único commit con mensaje: chore: prune unreachable ui components (phase 2b.2)
 3. Push únicamente a fix/public-repo-hardening.
 4. Espera y verifica el GitHub Actions run asociado.
 5. Mantén el PR #1 en Draft. No lo fusiones ni despliegues.

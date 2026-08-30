@@ -3,22 +3,22 @@
 **Fecha de auditoría:** 2026-08-30
 **Repositorio:** `julitodk06/lexiacode-website`
 **Rama:** `fix/public-repo-hardening`
-**SHA analizado:** `2a8db800969a5de48bb34eeacc3ea72f3184d6a2`
-**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — CERO ELIMINACIONES REALIZADAS`
+**SHA analizado:** `3faeaf7c37e11688f701fe38b46133de6e0101a6` (Fase 2B.1 ejecutada)
+**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTE 1 (FASE 2B.1) EJECUTADO`
 
 ---
 
 ## 1. Resumen Ejecutivo y Ecuaciones de Reconciliación
 
-Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` para la preparación de la futura **FASE 2B (Poda segura)**.
+Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada del **Lote 1 (FASE 2B.1 — Poda de 10 secciones landing obsoletas y CSS duplicado)**.
 
-> ⚠️ **Declaración de Seguridad:** En esta Fase 2A.1 **NO** se eliminó, renombró ni modificó ningún componente funcional, asset ni dependencia del proyecto. Todos los elementos identificados como huérfanos son únicamente candidatos bajo revisión. La Fase 2B no está autorizada para ejecución en esta entrega.
+> ⚠️ **Estado de Poda:** Se ejecutó exclusivamente el Lote 1 (11 archivos eliminados). Los lotes 2 (componentes UI), 3 (assets estáticos) y 4 (dependencias) permanecen **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
 
-### Ecuaciones de Reconciliación Obligatoria
+### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.1)
 
 1. **Módulos de Código Fuente:**
-   $$\text{sourceModulesTotal (112)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (66)}$$
-   *Verificación:* $112 = 46 + 66$ `[✓ VERIFICADO]`
+   $$\text{sourceModulesTotal (101)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (55)}$$
+   *Verificación:* $101 = 46 + 55$ `[✓ VERIFICADO]`
 
 2. **Archivos Estáticos en `public/`:**
    $$\text{totalPublicAssets (53)} = \text{referencedPublicAssets (25)} + \text{unreferencedPublicAssets (28)}$$
@@ -72,7 +72,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 3. Módulos de Código Fuente (`sourceModulesTotal`: 112)
+## 3. Módulos de Código Fuente (`sourceModulesTotal`: 101)
 
 ### A. Módulos Alcanzables (46) — `CONSERVAR / REVISAR`
 
@@ -101,21 +101,22 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 | `lib/translations.ts` | Diccionario ES/EN/PT | `CONSERVAR` |
 | `lib/utils.ts` | Utilidades Tailwind (`cn`) | `CONSERVAR` |
 
-### B. Módulos Candidatos No Alcanzables (66) — `CANDIDATOS A PODA EN FASE 2B`
+### B. Módulos Eliminados en Lote 1 (11) — `[✓ ELIMINADOS EN FASE 2B.1]`
+- `components/landing/benefits.tsx`
+- `components/landing/faq-section.tsx`
+- `components/landing/featured-project.tsx`
+- `components/landing/hero.tsx`
+- `components/landing/lead-magnet-section.tsx`
+- `components/landing/pain-points.tsx`
+- `components/landing/platform-demo.tsx`
+- `components/landing/press-section.tsx`
+- `components/landing/security.tsx`
+- `components/landing/services.tsx`
+- `styles/globals.css`
 
-1. **Secciones de Landing Obsoletas / Reemplazadas (10):**
-   - `components/landing/benefits.tsx`
-   - `components/landing/faq-section.tsx`
-   - `components/landing/featured-project.tsx`
-   - `components/landing/hero.tsx`
-   - `components/landing/lead-magnet-section.tsx`
-   - `components/landing/pain-points.tsx`
-   - `components/landing/platform-demo.tsx`
-   - `components/landing/press-section.tsx`
-   - `components/landing/security.tsx`
-   - `components/landing/services.tsx`
+### C. Módulos Candidatos No Alcanzables Restantes (55) — `CANDIDATOS A PODA EN FASE 2B.2`
 
-2. **Componentes UI de shadcn / Radix no importados (53):**
+1. **Componentes UI de shadcn / Radix no importados (53):**
    - `components/ui/accordion.tsx`
    - `components/ui/alert-dialog.tsx`
    - `components/ui/alert.tsx`
@@ -170,10 +171,9 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
    - `components/ui/use-mobile.tsx`
    - `components/ui/use-toast.ts`
 
-3. **Hooks Auxiliares y Estilos Duplicados (3):**
+2. **Hooks Auxiliares shadcn (2):**
    - `hooks/use-mobile.ts`
    - `hooks/use-toast.ts`
-   - `styles/globals.css` *(duplicado obsoleto de `app/globals.css`)*
 
 ---
 
@@ -206,7 +206,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 24. `public/services/software-microsaas.jpg`
 25. `public/tech-bg.png`
 
-### B. Assets Candidatos No Referenciados (28) — `CANDIDATOS A PODA EN FASE 2B`
+### B. Assets Candidatos No Referenciados (28) — `CANDIDATOS A PODA EN FASE 2B.3`
 1. `public/ai_automation_mockup.png`
 2. `public/clinica_yerba_buena.png`
 3. `public/hero-capture.png`
@@ -238,7 +238,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ### C. Auditoría Activa de Assets Inexistentes (`missingAssetRefs`)
 - **En grafo de código alcanzable:** `0 referencias rotas` `[✓ PASS]`
-- **En código no alcanzable (muerto):** `2 referencias rotas` (`/rwa_dashboard_mockup.png` en `benefits.tsx` y `platform-demo.tsx`, confirmando su obsolescencia).
+- **En código no alcanzable:** `0 referencias rotas` *(las 2 referencias huérfanas en `benefits.tsx` y `platform-demo.tsx` fueron eliminadas con el Lote 1)* `[✓ PASS]`
 
 ---
 
@@ -260,9 +260,9 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 - `react-dom` *(Peer dependency esencial para React 19 y Next.js)*
 - `autoprefixer` *(Plugin de PostCSS requerido por el build pipeline)*
 
-### C. Dependencias Candidatas a Poda (37) — `A EVALUAR EN FASE 2B`
+### C. Dependencias Candidatas a Poda (37) — `A EVALUAR EN FASE 2B.4`
 
-* **Paquetes Radix UI no importados (23):**
+* **Paquetes Radix UI no importados (25):**
   `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-aspect-ratio`, `@radix-ui/react-avatar`, `@radix-ui/react-checkbox`, `@radix-ui/react-collapsible`, `@radix-ui/react-context-menu`, `@radix-ui/react-dialog`, `@radix-ui/react-hover-card`, `@radix-ui/react-label`, `@radix-ui/react-menubar`, `@radix-ui/react-navigation-menu`, `@radix-ui/react-popover`, `@radix-ui/react-progress`, `@radix-ui/react-radio-group`, `@radix-ui/react-scroll-area`, `@radix-ui/react-select`, `@radix-ui/react-separator`, `@radix-ui/react-slider`, `@radix-ui/react-switch`, `@radix-ui/react-tabs`, `@radix-ui/react-toast`, `@radix-ui/react-toggle`, `@radix-ui/react-toggle-group`, `@radix-ui/react-tooltip`.
 * **Librerías de UI complejas sin uso (8):**
   `cmdk`, `date-fns`, `embla-carousel-react`, `input-otp`, `react-day-picker`, `react-resizable-panels`, `recharts`, `vaul`.
@@ -280,9 +280,9 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 7. Propuesta de Lotes para la Futura FASE 2B (No iniciada)
+## 7. Plan de Lotes Restantes de la FASE 2B
 
-* **Lote 1:** Eliminación de 10 secciones landing obsoletas y `styles/globals.css`.
-* **Lote 2:** Eliminación de 53 componentes UI no alcanzables y hooks huérfanos.
-* **Lote 3:** Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
-* **Lote 4:** Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
+* **Lote 1 (FASE 2B.1):** `[✓ COMPLETADO]` Eliminación de 10 secciones landing obsoletas y `styles/globals.css` (11 módulos fuente eliminados).
+* **Lote 2 (FASE 2B.2):** `[⏳ Pendiente]` Eliminación de 53 componentes UI no alcanzables y 2 hooks huérfanos.
+* **Lote 3 (FASE 2B.3):** `[⏳ Pendiente]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
+* **Lote 4 (FASE 2B.4):** `[⏳ Pendiente]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.
