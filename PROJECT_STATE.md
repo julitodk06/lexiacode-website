@@ -2,11 +2,11 @@
 
 > Fuente operativa para continuar el desarrollo sin depender del historial del chat.
 >
-> Última revisión arquitectónica: 2026-08-28 (UTC)  
-> Repositorio: https://github.com/julitodk06/lexiacode-website  
-> Rama activa: **fix/public-repo-hardening**  
-> Baseline de código analizada: **fb81f13140ed69c729b909fcb1e79eb48785a01a**  
-> Pull request: [Draft PR #1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)  
+> Última revisión arquitectónica: 2026-08-30 (UTC)
+> Repositorio: https://github.com/julitodk06/lexiacode-website
+> Rama activa: **fix/public-repo-hardening**
+> Baseline de código analizada: **b20522be91df6e6b01a250d8407cd1d5ff1d4875**
+> Pull request: [Draft PR #1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)
 > Base de comparación: **main** en **9a3210d7881be3d604fe7d48cb94d48029ca7c07**
 
 ## Estado Actual
@@ -262,65 +262,39 @@ Las dependencias y assets solo deben eliminarse después de una verificación de
 
 Cada fase debe ejecutarse sobre una rama específica, producir un commit revisable y terminar con criterios objetivos. No avanzar a la siguiente fase si la anterior falla.
 
-### FASE 1 — Cierre de calidad del PR #1
+### FASE 1 — Cierre de calidad del PR #1 [✓ COMPLETADA]
 
 **Objetivo:** dejar el PR actual sin warnings, con documentación operativa correcta y CI determinista.
+**Estado:** COMPLETADA en SHA `b20522be91df6e6b01a250d8407cd1d5ff1d4875`.
+**Resultados verificados:**
+- `npm ci`: Código 0 (505 paquetes auditados).
+- `npm run lint`: Código 0 (0 errores, 0 warnings con `--max-warnings=0`).
+- `npm run typecheck`: Código 0.
+- `npm run build`: Código 0 (28 rutas estáticas exportadas).
+- `npm audit --audit-level=high`: Código 0 (0 vulnerabilidades).
+- CI Run 33289008319 en GitHub Actions: Exitoso (verde).
 
-**Archivos autorizados para esta fase:**
+### FASE 2A — Inventario reproducible de código, assets y dependencias [✓ COMPLETADA]
 
-- .github/workflows/ci.yml
-- README.md
-- package.json
-- package-lock.json
-- app/blog/page.tsx
-- app/erc-3643/page.tsx
-- app/mercado-secundario/page.tsx
-- app/security-tokens/page.tsx
-- app/tokenizacion-de-activos/page.tsx
-- app/tokenizacion-inmobiliaria/page.tsx
-- app/tokenizacion-rwa/page.tsx
-- components/landing/header.tsx
-- lib/translations.ts
+**Objetivo:** construir un inventario auditable y determinista sin modificar el código ni eliminar archivos.
+**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md` y `scripts/audit-reachability.mjs`.
+**Resultados verificados:**
+- 112 módulos totales (49 alcanzables, 67 candidatos no alcanzables).
+- 53 assets estáticos (28 referenciados, 25 candidatos no referenciados).
+- 49 dependencias declaradas (10 directamente importadas, 2 indirectas, 37 candidatas a poda).
+- 0 imports locales rotos, 0 assets referenciados inexistentes.
 
-**Trabajo:**
+### FASE 2B — Poda segura de código, assets y dependencias [⏳ Pendiente de Autorización]
 
-1. Sustituir anchors y redirecciones internas por next/link o next/navigation, conservando rutas y **/#contacto**.
-2. Cambiar lint a **eslint . --max-warnings=0** y lograr cero errores y cero warnings.
-3. Corregir el README: requisito **npm >= 10.x**, cercas Markdown válidas y comandos coherentes con exportación estática.
-4. Eliminar el script **start: next start** o reemplazarlo solo por un mecanismo explícito de preview estático si ya existe una dependencia adecuada; no agregar servidor innecesario.
-5. Eliminar las promesas de 24 horas de lib/translations.ts.
-6. Actualizar actions/checkout y actions/setup-node a **@v7**, usando **node-version-file: .nvmrc**.
-7. Alinear ESLint y eslint-config-next con una versión estable compatible que no produzca la advertencia de soporte observada.
-8. Regenerar package-lock.json únicamente mediante npm install apropiado; no editarlo a mano.
-9. Ejecutar y documentar todos los checks.
+**Objetivo:** reducir superficie y peso eliminando código muerto, assets huérfanos y dependencias no utilizadas en lotes pequeños, sin alterar rutas ni apariencia pública.
 
-**Criterios de aceptación:**
-
-- **npm ci** finaliza con código 0.
-- **npm run lint** finaliza con código 0 y exactamente 0 warnings.
-- **npm run typecheck** finaliza con código 0.
-- **npm run build** finaliza con código 0 y conserva 28 rutas estáticas.
-- **npm audit --audit-level=high** finaliza con código 0 y 0 vulnerabilidades.
-- README renderiza correctamente y no indica **npm start** ni un servidor Next en producción.
-- No existen coincidencias para **24 horas**, **24 horas.**, **até 24 horas** ni **next start** en archivos operativos.
-- Los enlaces internos señalados usan Link/router y mantienen su destino.
-- El workflow usa checkout@v7, setup-node@v7 y .nvmrc.
-- El diff se limita a los archivos autorizados.
-- Los cambios se commitean y pushean a **fix/public-repo-hardening**.
-- El PR #1 permanece **Draft**.
-- No se hace merge, deploy, force push, cambio de DNS ni modificación de secretos.
-
-### FASE 2 — Poda segura de código, assets y dependencias
-
-**Objetivo:** reducir superficie y peso sin alterar rutas ni apariencia pública.
-
-1. Construir un inventario reproducible de módulos y assets alcanzables.
-2. Clasificar falsos positivos y archivos deliberadamente conservados.
-3. Eliminar código y assets confirmados como huérfanos en lotes pequeños.
-4. Eliminar dependencias no usadas y regenerar lockfile.
+1. Lote 1: Eliminar secciones obsoletas de `components/landing/` y CSS duplicado.
+2. Lote 2: Eliminar componentes UI no utilizados en `components/ui/`.
+3. Lote 3: Eliminar assets huérfanos en `public/` (preservando `robots.txt` y assets activos).
+4. Lote 4: Podar dependencias en `package.json` y regenerar lockfile.
 5. Verificar build y comparar visualmente las rutas críticas.
 
-**Aceptación:** cero imports rotos, cero assets 404, mismas rutas, CI verde y reducción documentada de módulos/paquetes.
+**Aceptación:** cero imports rotos, cero assets 404, 28 rutas estáticas conservadas, CI verde y reducción documentada de módulos/paquetes.
 
 ### FASE 3 — Cobertura automatizada mínima
 
@@ -370,62 +344,39 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 1 — Cierre de calidad del PR #1**
+**FASE 2B — Poda segura de código, assets y dependencias**
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 1 — Cierre de calidad del PR #1” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B — Poda segura de código, assets y dependencias” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
 
 Antes de modificar:
-1. Lee PROJECT_STATE.md completo.
+1. Lee PROJECT_STATE.md y docs/PHASE_2A_REACHABILITY_AUDIT.md completos.
 2. Confirma que estás en la rama fix/public-repo-hardening y que el PR #1 sigue Draft.
 3. Registra el SHA inicial y ejecuta git status.
 4. No trabajes sobre main y no crees otra rama.
 5. No hagas merge, deploy, force push, cambios de DNS, variables de entorno ni secretos.
 
-Archivos autorizados:
-- .github/workflows/ci.yml
-- README.md
-- package.json
-- package-lock.json
-- app/blog/page.tsx
-- app/erc-3643/page.tsx
-- app/mercado-secundario/page.tsx
-- app/security-tokens/page.tsx
-- app/tokenizacion-de-activos/page.tsx
-- app/tokenizacion-inmobiliaria/page.tsx
-- app/tokenizacion-rwa/page.tsx
-- components/landing/header.tsx
-- lib/translations.ts
+Implementa en lotes pequeños:
+- Lote 1: Eliminar secciones landing obsoletas y styles/globals.css.
+- Lote 2: Eliminar componentes UI no utilizados.
+- Lote 3: Eliminar 24 assets estáticos huérfanos (conservando robots.txt).
+- Lote 4: Podar dependencias no utilizadas en package.json y regenerar package-lock.json.
 
-Implementa:
-1. Reemplaza los anchors y window.location.href internos señalados por ESLint con next/link o next/navigation. Conserva exactamente sus rutas y el anchor /#contacto.
-2. Cambia el script lint a “eslint . --max-warnings=0” y corrige todos los warnings existentes.
-3. Corrige README.md: usa “npm >= 10.x”, cercas Markdown triples válidas y comandos coherentes con un proyecto Next.js de exportación estática.
-4. Elimina “start: next start” de package.json. No agregues un servidor si no es necesario.
-5. Elimina de lib/translations.ts las promesas de contacto en 24 horas en español y portugués, sin inventar un nuevo SLA.
-6. Actualiza .github/workflows/ci.yml a actions/checkout@v7 y actions/setup-node@v7; configura setup-node con node-version-file: .nvmrc y cache: npm.
-7. Alinea ESLint y eslint-config-next con versiones estables compatibles con Next 16.3.3 y Node 20, evitando la advertencia de versión no soportada. Regenera package-lock.json con npm; no lo edites manualmente.
-8. Mantén output: export, trailingSlash, el chatbot local, las 28 rutas y todos los contratos documentados en PROJECT_STATE.md.
-
-Validación obligatoria:
+Validación obligatoria tras cada lote:
 - git diff --check
 - npm ci
-- npm run lint: código 0, 0 errores y 0 warnings
-- npm run typecheck: código 0
-- npm run build: código 0 y 28 rutas estáticas
-- npm audit --audit-level=high: código 0 y 0 vulnerabilidades
-- búsqueda final sin “next start”, sin promesas de “24 horas”/“até 24 horas” y sin los patrones internos que generaban warnings
-- confirma que el diff solo toca los archivos autorizados
-
-Si una actualización de ESLint entra en conflicto con Next 16.3.3 o Node 20, detente, documenta el conflicto con la salida exacta y propone la corrección mínima; no uses --force, --legacy-peer-deps ni desactives reglas para ocultar errores.
+- npm run audit:reachability
+- npm run lint
+- npm run typecheck
+- npm run build (28 rutas estáticas)
+- npm audit --audit-level=high
 
 Al terminar:
-1. Muestra el diff resumido y los resultados exactos de cada validación.
-2. Haz un único commit con mensaje: chore: close PR quality gates
+1. Muestra el diff resumido y los resultados exactos de validación.
+2. Haz un único commit con mensaje: chore: prune dead code, unused assets and dependencies (phase 2b)
 3. Push únicamente a fix/public-repo-hardening.
-4. Espera y verifica el GitHub Actions run asociado al nuevo commit.
-5. Informa SHA final, URL del run, estado del PR #1 y cualquier warning restante.
-6. Mantén el PR #1 en Draft. No lo fusiones ni despliegues.
+4. Espera y verifica el GitHub Actions run asociado.
+5. Mantén el PR #1 en Draft. No lo fusiones ni despliegues.
 ~~~

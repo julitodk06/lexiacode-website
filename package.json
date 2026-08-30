@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit:reachability": "node scripts/audit-reachability.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
