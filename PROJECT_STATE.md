@@ -353,9 +353,22 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 ---
 
-### FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones [⏳ EN CURSO / AUTORIZADA]
+### FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones [✓ COMPLETADA]
 
 **Objetivo:** auditoría integral de lectura y análisis de la web estática exportada y su código fuente sin modificar lógica, texto ni estilos.
+**Estado:** COMPLETADA y documentada en `docs/PHASE_4A_ACCESSIBILITY_SEO_CONTENT_AUDIT.md`.
+**Veredicto:** `GO PARA FASE 4B`.
+**Resumen de Hallazgos:**
+- **Accesibilidad (P1):** Falta de `<h1>` en `/como-funciona`; clases de color hardcodeadas en `/sobre-nosotros` que requieren adaptación temática a dark mode.
+- **SEO (P2):** 7 páginas especializadas sin exportar objeto `metadata` individual (`/agentes-ia`, `/blog`, `/consultoria-legaltech`, `/guia-tokenizacion`, `/proyectos-rwa`, `/smart-contracts`, `/software-microsaas`); falta de canonical y Open Graph completos en `RootLayout`.
+- **Navegación (P2):** Normalización de scroll/redirección hacia `/#contact` desde rutas secundarias en el chatbot.
+- **Contenido (P1/P2):** Ratificación de afirmaciones sobre estudio de producto/tecnología, iniciativa minera (~USD 100M, recomendación de no avanzar por riesgos, no captación) y perfil profesional.
+
+---
+
+### FASE 4B — Corrección de accesibilidad, SEO y contenido [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+
+**Objetivo:** ejecutar las correcciones identificadas en el informe `docs/PHASE_4A_ACCESSIBILITY_SEO_CONTENT_AUDIT.md`.
 
 ---
 
@@ -363,7 +376,7 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones**
+**FASE 4B — Corrección de accesibilidad, SEO y contenido**
 
 1. Validar jerarquía de headings, nombres accesibles, contraste y teclado.
 2. Verificar canonical, Open Graph, sitemap, robots y datos estructurados.
