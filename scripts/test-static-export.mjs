@@ -277,8 +277,8 @@ if (sobreNosotrosIds.has('careers')) {
   errors++
 }
 
-// 7. Verificación de Metadatos SEO y Open Graph (Validación activa en Fase 4B)
-console.log('\n--- Verificación de Metadatos SEO y Open Graph ---')
+// 7. Verificación de Metadatos SEO y Open Graph en páginas clave
+console.log('\n--- Verificación de Metadatos SEO y Open Graph (Fase 4B) ---')
 const SEVEN_ROUTES = [
   'index.html',
   'agentes-ia/index.html',
@@ -290,26 +290,83 @@ const SEVEN_ROUTES = [
   'software-microsaas/index.html'
 ]
 
-let verifiedMetadataCount = 0
+const seenTitles = new Set()
+
 for (const routeHtml of SEVEN_ROUTES) {
   const full = path.join(outDir, routeHtml)
-  if (!fs.existsSync(full)) continue
+  if (!fs.existsSync(full)) {
+    console.error(`  [X] Archivo HTML no encontrado: ${routeHtml}`)
+    errors++
+    continue
+  }
   const html = fs.readFileSync(full, 'utf-8')
   const rel = `out/${routeHtml}`
 
-  // Verificar <title>
-  const titleMatch = html.match(/<title>([^<]+)<\/title>/i)
-  if (titleMatch && titleMatch[1].trim()) {
-    verifiedMetadataCount++
+  // Verificar <title> no vacío y diferenciado
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+  if (!titleMatch || !titleMatch[1].trim()) {
+    console.error(`  [X] Falta <title> o está vacío en ${rel}`)
+    errors++
+  } else {
+    const title = titleMatch[1].trim()
+    if (seenTitles.has(title)) {
+      console.error(`  [X] Título duplicado detectado en ${rel}: "${title}"`)
+      errors++
+    }
+    seenTitles.add(title)
   }
 
-  // Verificar <meta name="description"
+  // Verificar <meta name="description" no vacía
   const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']description["']/i)
   if (!descMatch || !descMatch[1].trim()) {
-    // Si no hay description en Phase 3.1 aún (antes de layouts 4B), loguear aviso
+    console.error(`  [X] Falta meta description en ${rel}`)
+    errors++
+  }
+
+  // Verificar canonical
+  const canonicalMatch = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i) || html.match(/<link\s+href=["']([^"']+)["']\s+rel=["']canonical["']/i)
+  if (!canonicalMatch || !canonicalMatch[1].trim()) {
+    console.error(`  [X] Falta link rel="canonical" en ${rel}`)
+    errors++
+  }
+
+  // Verificar og:title
+  const ogTitleMatch = html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']/i)
+  if (!ogTitleMatch || !ogTitleMatch[1].trim()) {
+    console.error(`  [X] Falta meta og:title en ${rel}`)
+    errors++
+  }
+
+  // Verificar og:description
+  const ogDescMatch = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']/i)
+  if (!ogDescMatch || !ogDescMatch[1].trim()) {
+    console.error(`  [X] Falta meta og:description en ${rel}`)
+    errors++
+  }
+
+  // Verificar og:url
+  const ogUrlMatch = html.match(/<meta\s+property=["']og:url["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:url["']/i)
+  if (!ogUrlMatch || !ogUrlMatch[1].trim()) {
+    console.error(`  [X] Falta meta og:url en ${rel}`)
+    errors++
+  }
+
+  // Verificar og:image
+  const ogImageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i)
+  if (!ogImageMatch || !ogImageMatch[1].trim()) {
+    console.error(`  [X] Falta meta og:image en ${rel}`)
+    errors++
+  }
+
+  // Verificar twitter:card
+  const twitterCardMatch = html.match(/<meta\s+name=["']twitter:card["']\s+content=["']([^"']+)["']/i) || html.match(/<meta\s+content=["']([^"']+)["']\s+name=["']twitter:card["']/i)
+  if (!twitterCardMatch || !twitterCardMatch[1].trim()) {
+    console.error(`  [X] Falta meta twitter:card en ${rel}`)
+    errors++
   }
 }
-console.log(`  [✓] Metadatos básicos y títulos verificados en ${verifiedMetadataCount} rutas.`)
+
+console.log(`  [✓] Metadatos SEO (title diferenciado, description, canonical, OG y Twitter) verificados en las 8 rutas evaluadas.`)
 
 console.log(`\n========================================`)
 if (errors === 0) {

@@ -6,15 +6,15 @@ import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
 import { LanguageProvider } from "@/lib/language-context"
 import { BlockchainBackground } from "@/components/ui/blockchain-background"
-import { 
-  Building, 
-  Coins, 
-  LandPlot, 
-  ShieldCheck, 
-  Cpu, 
-  Layers, 
-  Scale, 
-  FileText, 
+import {
+  Building,
+  Coins,
+  LandPlot,
+  ShieldCheck,
+  Cpu,
+  Layers,
+  Scale,
+  FileText,
   ArrowRight,
   Sparkles
 } from "lucide-react"
@@ -38,7 +38,7 @@ const productCases = [
     icon: LandPlot,
     category: "RWA · Evaluación de Estructuración",
     title: "Evaluación de Iniciativa Minera",
-    problemOpportunity: "Análisis preliminar de factibilidad para estructurar y digitalizar derechos operativos sobre un activo minero.",
+    problemOpportunity: "Análisis preliminar de factibilidad técnica para estructurar y digitalizar derechos operativos sobre un activo minero (valuación de referencia del activo subyacente ~USD 100M).",
     scopeCompleted: "Análisis preliminar de arquitectura funcional, modelado de workflows de smart contracts y participación en due diligence y revisión preliminar de riesgos técnicos, legales y de contraparte.",
     realStatus: "Evaluación preliminar finalizada",
     technologies: ["Solidity", "Workflows ERC-3643", "Due Diligence Técnico"],
@@ -65,7 +65,7 @@ export default function ProyectosRwaPage() {
         <section className="relative pt-36 pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
           <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
-            
+
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 backdrop-blur-md">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary"></span>
               <span className="font-mono text-[10px] font-bold tracking-widest text-primary uppercase">INICIATIVAS Y CASOS DE PRODUCTO</span>
@@ -91,7 +91,7 @@ export default function ProyectosRwaPage() {
             <h2 className="text-2xl font-bold tracking-tight text-foreground mb-8 flex items-center gap-2.5 font-mono uppercase text-xs">
               <span className="h-2 w-2 rounded-full bg-primary" /> Casos Evaluados
             </h2>
-            
+
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
               {productCases.map((project) => (
                 <div
@@ -114,7 +114,7 @@ export default function ProyectosRwaPage() {
                     {project.location && (
                       <p className="text-xs text-muted-foreground font-medium mb-4">{project.location}</p>
                     )}
-                    
+
                     <div className="space-y-3 text-xs leading-relaxed mt-3">
                       <div>
                         <span className="font-semibold text-foreground/90 block mb-0.5">Problema u Oportunidad:</span>
@@ -163,11 +163,11 @@ export default function ProyectosRwaPage() {
                   <ShieldCheck className="h-4.5 w-4.5 text-primary" />
                   <span className="font-mono text-[10px] font-bold tracking-widest text-primary uppercase">CRITERIOS DE DUE DILIGENCE Y PRODUCTO</span>
                 </div>
-                
+
                 <h2 className="text-3xl font-black text-foreground sm:text-4xl leading-tight">
                   Evaluación Rigurosa y Entrega por Etapas
                 </h2>
-                
+
                 <p className="text-sm text-muted-foreground leading-relaxed font-light">
                   En LexiaCode priorizamos la viabilidad técnica, la seguridad de contratos inteligentes y el análisis riguroso de riesgos. Cuando una iniciativa no reúne las condiciones jurídicas o técnicas adecuadas, recomendamos no avanzar antes de comprometer recursos.
                 </p>

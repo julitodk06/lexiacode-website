@@ -4,14 +4,14 @@ import { LanguageProvider } from "@/lib/language-context"
 import { ShieldCheck, Heart, Award, Zap, Users, Sparkles, ChevronDown } from "lucide-react"
 
 export const metadata = {
-  title: "Sobre Nosotros - LexiaCode",
-  description: "Conocé la empresa, nuestra visión, misión y los valores que impulsan la tokenización y estructuración de activos reales (RWA).",
+  title: "Sobre Nosotros | LexiaCode",
+  description: "Conoce nuestra visión, principios de ingeniería y equipo en dirección de producto, arquitectura funcional y smart contracts.",
 }
 
 export default function SobreNosotrosPage() {
   return (
     <LanguageProvider>
-      <main className="relative min-h-screen bg-[#07080a] overflow-x-hidden pt-28 pb-12">
+      <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden pt-28 pb-12">
         {/* Glows decorativos laterales */}
         <div className="absolute top-1/4 left-0 w-[400px] h-[800px] bg-blue-500/5 blur-[150px] rounded-full pointer-events-none z-0" />
         <div className="absolute top-2/4 right-0 w-[400px] h-[800px] bg-cyan-500/5 blur-[150px] rounded-full pointer-events-none z-0" />
@@ -19,56 +19,56 @@ export default function SobreNosotrosPage() {
         <Header />
 
         {/* Contenedor Boxed Layout Principal */}
-        <div className="relative z-10 mx-auto max-w-5xl bg-white text-gray-900 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden rounded-2xl border border-gray-800/10">
-          
-          {/* ═══════════════════════ HERO SECTION (Blanco Puro) ═══════════════════════ */}
-          <section className="bg-white py-20 px-8 lg:px-16 text-center">
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400 block mb-3">
+        <div className="relative z-10 mx-auto max-w-5xl bg-card text-card-foreground shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden rounded-2xl border border-border/40">
+
+          {/* ═══════════════════════ HERO SECTION ═══════════════════════ */}
+          <section className="bg-card py-20 px-8 lg:px-16 text-center border-b border-border/40">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground block mb-3">
               La Empresa
             </span>
-            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl uppercase mb-8">
+            <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl uppercase mb-8">
               Sobre Nosotros
             </h1>
-            <p className="max-w-3xl mx-auto text-lg text-gray-600 leading-relaxed font-light mb-12">
+            <p className="max-w-3xl mx-auto text-lg text-muted-foreground leading-relaxed font-light mb-12">
               Somos un estudio de producto y tecnología especializado en Web3, RWA e inteligencia artificial. Diseñamos la estrategia de producto, la arquitectura funcional y los flujos de smart contracts necesarios para evaluar y desarrollar iniciativas de tokenización por etapas.
             </p>
-            
+
             {/* Foto ancha horizontal (Separador visual) */}
-            <div className="relative w-full h-[350px] md:h-[450px] rounded-xl overflow-hidden shadow-lg border border-gray-200">
+            <div className="relative w-full h-[350px] md:h-[450px] rounded-xl overflow-hidden shadow-lg border border-border/40">
               <img
                 src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=70&w=800&auto=format&fit=crop"
                 alt="LexiaCode Corporate"
                 className="w-full h-full object-cover"
                 loading="eager"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
             </div>
           </section>
 
-          {/* ═══════════════════════ MISIÓN & VISIÓN (Fondo Oscuro) ═══════════════════════ */}
-          <section className="relative bg-[#111215] text-white py-24 px-8 lg:px-16 overflow-hidden">
+          {/* ═══════════════════════ MISIÓN & VISIÓN ═══════════════════════ */}
+          <section className="relative bg-secondary/30 text-foreground py-24 px-8 lg:px-16 overflow-hidden border-b border-border/40">
             {/* Sutil textura técnica de fondo */}
             <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-            
+
             <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
               {/* Visión */}
               <div className="space-y-4">
-                <h2 className="text-2xl tracking-wide uppercase text-gray-400 font-light">
-                  NUESTRA <span className="font-bold text-white">VISIÓN</span>
+                <h2 className="text-2xl tracking-wide uppercase text-muted-foreground font-light">
+                  NUESTRA <span className="font-bold text-foreground">VISIÓN</span>
                 </h2>
                 <div className="h-1 w-12 bg-primary rounded-full mb-6" />
-                <p className="text-base text-gray-300 leading-relaxed font-light">
+                <p className="text-base text-muted-foreground leading-relaxed font-light">
                   Consolidarnos como un estudio de referencia en arquitectura funcional Web3, smart contracts e inteligencia artificial, facilitando que empresas y desarrolladores evalúen e implementen soluciones tecnológicas sólidas, trazables y auditables por etapas.
                 </p>
               </div>
 
               {/* Misión */}
               <div className="space-y-4">
-                <h2 className="text-2xl tracking-wide uppercase text-gray-400 font-light">
-                  NUESTRA <span className="font-bold text-white">MISIÓN</span>
+                <h2 className="text-2xl tracking-wide uppercase text-muted-foreground font-light">
+                  NUESTRA <span className="font-bold text-foreground">MISIÓN</span>
                 </h2>
                 <div className="h-1 w-12 bg-primary rounded-full mb-6" />
-                <p className="text-base text-gray-300 leading-relaxed font-light">
+                <p className="text-base text-muted-foreground leading-relaxed font-light">
                   LexiaCode desarrolla software robusto, arquitectura de smart contracts con enfoque de compliance-by-design y agentes de inteligencia artificial aplicados, priorizando el análisis de viabilidad técnica y la calidad en cada entrega de producto.
                 </p>
               </div>
@@ -86,13 +86,13 @@ export default function SobreNosotrosPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent mix-blend-multiply" />
           </section>
 
-          {/* ═══════════════════════ VALORES GENÉTICOS (Gris Claro) ═══════════════════════ */}
-          <section className="bg-[#f9f9f9] py-20 px-8 lg:px-16 text-center border-t border-gray-200">
+          {/* ═══════════════════════ VALORES GENÉTICOS ═══════════════════════ */}
+          <section className="bg-card py-20 px-8 lg:px-16 text-center border-b border-border/40">
             <div className="flex justify-center mb-4">
               <ChevronDown className="h-5 w-5 text-primary animate-bounce" />
             </div>
-            
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 uppercase">
+
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground uppercase">
               Nuestros Valores Genéticos
             </h2>
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary block mt-2 mb-16">
@@ -104,11 +104,10 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Heart className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Pasión</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Pasión</h3>
                 </div>
-                {/* Línea horizontal delgada de color naranja corporativo (100% de ancho) */}
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Nuestra pasión distingue todo lo que somos y todo lo que hacemos como grupo humano. Somos intensamente dedicados con la realización de nuestras ideas y esperamos la misma intensidad de quienes colaboran con nosotros.
                 </p>
               </div>
@@ -117,10 +116,10 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Award className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Innovación</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Innovación</h3>
                 </div>
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Nos resistimos a la idea de que las cosas no pueden ser siempre mejores de lo que son. Nos une la innovación, el desarrollo de soluciones de vanguardia y la creación de valor constante en cada línea de código.
                 </p>
               </div>
@@ -129,19 +128,19 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Zap className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Acción</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Acción</h3>
                 </div>
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Jamás renunciamos a nuestra decidida tendencia a la acción. Actuamos, resolvemos y consolidamos. La capacidad de ejecución ágil es el gen que nos permite diseñar soluciones eficientes, robustas y de alta calidad técnica.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* ═══════════════════════ VALORES CORPORATIVOS (Blanco Puro) ═══════════════════════ */}
-          <section className="bg-white py-20 px-8 lg:px-16 text-center border-t border-gray-100">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 uppercase">
+          {/* ═══════════════════════ VALORES CORPORATIVOS ═══════════════════════ */}
+          <section className="bg-secondary/20 py-20 px-8 lg:px-16 text-center border-b border-border/40">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground uppercase">
               Nuestros Valores Corporativos
             </h2>
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary block mt-2 mb-16">
@@ -153,10 +152,10 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Users className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Orientación al Cliente</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Orientación al Cliente</h3>
                 </div>
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Trabajamos a partir de las necesidades de usuarios, organizaciones y stakeholders, orientando el diseño de producto a soluciones tecnológicas claras, útiles y defendibles.
                 </p>
               </div>
@@ -165,10 +164,10 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Sparkles className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Mejora Continua</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Mejora Continua</h3>
                 </div>
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Nos desafiamos día tras día en la excelencia de nuestra gestión e infraestructura on-chain, incorporando mejoras rigurosas a los procesos e impulsando el aprendizaje tecnológico continuo.
                 </p>
               </div>
@@ -177,19 +176,19 @@ export default function SobreNosotrosPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <ShieldCheck className="h-6 w-6 text-primary shrink-0" />
-                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-gray-900">Confianza</h3>
+                  <h3 className="text-lg font-extrabold uppercase tracking-wider text-foreground">Confianza</h3>
                 </div>
                 <div className="h-0.5 w-full bg-[#e87722]" />
-                <p className="text-sm text-gray-600 leading-relaxed font-light pt-2">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light pt-2">
                   Construimos confianza respetando y honrando nuestros compromisos, aplicando mecanismos de trazabilidad, control y transparencia acordes con la arquitectura de cada solución.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* ═══════════════════════ NUESTRO EQUIPO (Gris Claro) ═══════════════════════ */}
-          <section className="bg-[#f9f9f9] py-20 px-8 lg:px-16 text-center border-t border-gray-200">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 uppercase">
+          {/* ═══════════════════════ NUESTRO EQUIPO ═══════════════════════ */}
+          <section className="bg-card py-20 px-8 lg:px-16 text-center border-b border-border/40">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground uppercase">
               Dirección de Producto &amp; Tecnología
             </h2>
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary block mt-2 mb-12">
@@ -197,13 +196,13 @@ export default function SobreNosotrosPage() {
             </span>
 
             <div className="max-w-md mx-auto text-left mb-12">
-              <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm hover:border-primary transition-all duration-300 flex flex-col items-center text-center">
-                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-gray-100 shrink-0 mb-6 bg-gray-50 shadow-md">
+              <div className="bg-secondary/20 border border-border/40 rounded-3xl p-8 shadow-sm hover:border-primary transition-all duration-300 flex flex-col items-center text-center">
+                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-border/40 shrink-0 mb-6 bg-secondary/40 shadow-md">
                   <img src="/ceo1.webp" alt="Julio A. Villalobo" className="h-full w-full object-cover" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Julio A. Villalobo</h3>
+                <h3 className="text-xl font-bold text-foreground">Julio A. Villalobo</h3>
                 <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-4">Managing Director | Technology, AI &amp; Product Lead</p>
-                <p className="text-xs text-gray-600 leading-relaxed font-light mb-6">
+                <p className="text-xs text-muted-foreground leading-relaxed font-light mb-6">
                   Dirige la estrategia de producto, arquitectura funcional, coordinación técnica, QA, seguridad y entrega por etapas. Diseña, escribe y modifica contratos en Solidity (apoyado en herramientas de IA), desarrolla pruebas de software, revisa lógica contractual y riesgos comunes de seguridad, y documenta hallazgos técnicos.
                 </p>
                 <div className="flex gap-4 items-center justify-center">
@@ -218,21 +217,21 @@ export default function SobreNosotrosPage() {
             </div>
 
             {/* Nota institucional */}
-            <div className="max-w-2xl mx-auto bg-white border border-gray-200 rounded-2xl p-6 text-xs text-gray-600 leading-relaxed font-light">
-              <strong className="text-gray-900 block mb-1">Nota Institucional sobre Coordinación Externa:</strong>
+            <div className="max-w-2xl mx-auto bg-secondary/30 border border-border/40 rounded-2xl p-6 text-xs text-muted-foreground leading-relaxed font-light">
+              <strong className="text-foreground block mb-1">Nota Institucional sobre Coordinación Externa:</strong>
               Según el alcance de cada iniciativa, LexiaCode puede coordinar profesionales independientes especializados en aspectos legales, regulatorios, compliance, seguridad y desarrollo. Su participación se define y contrata específicamente para cada proyecto.
             </div>
           </section>
 
-          {/* ═══════════════════════ RED DE TALENTO (Blanco Puro) ═══════════════════════ */}
-          <section id="careers" className="bg-white py-20 px-8 lg:px-16 text-center border-t border-gray-100">
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 uppercase">
+          {/* ═══════════════════════ RED DE TALENTO ═══════════════════════ */}
+          <section id="careers" className="bg-card py-20 px-8 lg:px-16 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground uppercase">
               Red de Talento y Colaboradores
             </h2>
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary block mt-2 mb-8">
               Red de Especialistas
             </span>
-            <p className="max-w-2xl mx-auto text-sm text-gray-600 font-light leading-relaxed mb-10">
+            <p className="max-w-2xl mx-auto text-sm text-muted-foreground font-light leading-relaxed mb-10">
               LexiaCode mantiene contacto con profesionales independientes de producto, desarrollo, Solidity, inteligencia artificial, seguridad y regulación para posibles colaboraciones futuras. Actualmente no se publican vacantes laborales activas.
             </p>
           </section>

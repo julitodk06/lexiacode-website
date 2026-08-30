@@ -11,8 +11,13 @@ const STEP_IMAGES = [
   "/how-it-works/howitworks_step4.png"
 ]
 
-export function HowItWorks() {
+interface HowItWorksProps {
+  asPageHeading?: boolean
+}
+
+export function HowItWorks({ asPageHeading = false }: HowItWorksProps) {
   const { t } = useLanguage()
+  const HeadingTag = asPageHeading ? "h1" : "h2"
 
   return (
     <section id="how-it-works" className="relative py-24 lg:py-32">
@@ -26,9 +31,9 @@ export function HowItWorks() {
           <p className="font-mono text-sm font-semibold uppercase tracking-widest text-accent">
             {t.howItWorks.label}
           </p>
-          <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <HeadingTag className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {t.howItWorks.title}
-          </h2>
+          </HeadingTag>
           <p className="mt-4 text-pretty text-lg text-muted-foreground">
             {t.howItWorks.subtitle}
           </p>
@@ -57,14 +62,14 @@ export function HowItWorks() {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-                    
+
                     {/* Floating Pill: Icon */}
                     <div className="absolute bottom-3 left-3 z-20">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background/90 backdrop-blur-md border border-border/40 transition-transform group-hover:scale-105 shadow-md">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
                     </div>
-                    
+
                     <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground font-mono shadow-md">
                       {index + 1}
                     </span>
