@@ -3,26 +3,26 @@
 **Fecha de auditoría:** 2026-08-30
 **Repositorio:** `julitodk06/lexiacode-website`
 **Rama:** `fix/public-repo-hardening`
-**SHA analizado:** `7117ff9b09157b4edf17751dcbddf0672d8a8e18` (Fase 2B.2 ejecutada)
-**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTES 1 Y 2 (FASES 2B.1 Y 2B.2) EJECUTADOS`
+**SHA analizado:** `e114ece110b161a0fc9f811ea8bc985a1f378bf5` (Fase 2B.3 ejecutada)
+**Estado:** `INVENTARIO REPRODUCIBLE RECONCILIADO — LOTES 1, 2 Y 3 (FASES 2B.1, 2B.2 Y 2B.3) EJECUTADOS`
 
 ---
 
 ## 1. Resumen Ejecutivo y Ecuaciones de Reconciliación
 
-Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada de los **Lotes 1 y 2 (FASE 2B.1 — Poda de 10 secciones landing obsoletas y CSS duplicado; FASE 2B.2 — Poda de 53 componentes UI no utilizados y 2 hooks huérfanos)**.
+Este documento establece el inventario exacto y formalmente reconciliado de módulos de código fuente, archivos estáticos públicos y dependencias de `package.json` tras la ejecución controlada de los **Lotes 1, 2 y 3 (FASE 2B.1 — Secciones landing; FASE 2B.2 — Componentes UI y hooks; FASE 2B.3 — Poda de 28 assets estáticos huérfanos en `public/`)**.
 
-> ⚠️ **Estado de Poda:** Se han ejecutado exclusivamente los Lotes 1 y 2 (66 archivos eliminados en total). Los lotes 3 (assets estáticos huérfanos) y 4 (dependencias de producción) permanecen **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
+> ⚠️ **Estado de Poda:** Se han ejecutado los Lotes 1, 2 y 3. El Lote 4 (dependencias de producción) permanece **PENDIENTES DE REVISIÓN Y AUTORIZACIÓN**.
 
-### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.2)
+### Ecuaciones de Reconciliación Obligatoria (Post Fase 2B.3)
 
 1. **Módulos de Código Fuente:**
    $$\text{sourceModulesTotal (46)} = \text{reachableSourceModules (46)} + \text{unreachableSourceModules (0)}$$
    *Verificación:* $46 = 46 + 0$ `[✓ VERIFICADO]`
 
 2. **Archivos Estáticos en `public/`:**
-   $$\text{totalPublicAssets (53)} = \text{referencedPublicAssets (25)} + \text{unreferencedPublicAssets (28)}$$
-   *Verificación:* $53 = 25 + 28$ `[✓ VERIFICADO]`
+   $$\text{totalPublicAssets (25)} = \text{referencedPublicAssets (25)} + \text{unreferencedPublicAssets (0)}$$
+   *Verificación:* $25 = 25 + 0$ `[✓ VERIFICADO]`
 
 3. **Dependencias de Producción en `package.json`:**
    $$\text{declaredProductionDependencies (49)} = \text{directlyImported (10)} + \text{indirectlyRequired (2)} + \text{unreferencedCandidates (37)}$$
@@ -114,7 +114,7 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 ---
 
-## 4. Archivos Estáticos (`public/` — `totalPublicAssets`: 53)
+## 4. Archivos Estáticos (`public/` — `totalPublicAssets`: 25)
 
 ### A. Assets Referenciados por Código Alcanzable (25) — `CONSERVAR`
 1. `public/apple-icon.png`
@@ -143,39 +143,15 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 24. `public/services/software-microsaas.jpg`
 25. `public/tech-bg.png`
 
-### B. Assets Candidatos No Referenciados (28) — `CANDIDATOS A PODA EN FASE 2B.3`
-1. `public/ai_automation_mockup.png`
-2. `public/clinica_yerba_buena.png`
-3. `public/hero-capture.png`
-4. `public/hero_custom.png`
-5. `public/how-it-works/paso1.jpg`
-6. `public/how-it-works/paso2.png`
-7. `public/how-it-works/paso3.jpg`
-8. `public/how-it-works/paso4.jpg`
-9. `public/legal_compliance_rwa.png`
-10. `public/placeholder-logo.png`
-11. `public/placeholder-logo.svg`
-12. `public/placeholder-user.jpg`
-13. `public/placeholder.jpg`
-14. `public/placeholder.svg`
-15. `public/projects/agriculture.jpg`
-16. `public/projects/complejo.jpg`
-17. `public/projects/complejo.png`
-18. `public/projects/real-estate.jpg`
-19. `public/security_architecture.png`
-20. `public/services/agentes-ia.jpg`
-21. `public/services/agentes-ia.png`
-22. `public/services/tokenizacion.jpg`
-23. `public/tafi_valle.png`
-24. `public/tokenizacion-hero-dashboard.jpg`
-25. `public/tokenizacion-hero.png`
-26. `public/torre_lexia.png`
-27. `public/why-tokenize-2026.webp`
-28. `public/why-tokenize-real.jpg`
+### B. Assets Eliminados en Lote 3 (28) — `[✓ ELIMINADOS EN FASE 2B.3]`
+`public/ai_automation_mockup.png`, `public/clinica_yerba_buena.png`, `public/hero-capture.png`, `public/hero_custom.png`, `public/how-it-works/paso1.jpg`, `public/how-it-works/paso2.png`, `public/how-it-works/paso3.jpg`, `public/how-it-works/paso4.jpg`, `public/legal_compliance_rwa.png`, `public/placeholder-logo.png`, `public/placeholder-logo.svg`, `public/placeholder-user.jpg`, `public/placeholder.jpg`, `public/placeholder.svg`, `public/projects/agriculture.jpg`, `public/projects/complejo.jpg`, `public/projects/complejo.png`, `public/projects/real-estate.jpg`, `public/security_architecture.png`, `public/services/agentes-ia.jpg`, `public/services/agentes-ia.png`, `public/services/tokenizacion.jpg`, `public/tafi_valle.png`, `public/tokenizacion-hero-dashboard.jpg`, `public/tokenizacion-hero.png`, `public/torre_lexia.png`, `public/why-tokenize-2026.webp`, `public/why-tokenize-real.jpg`.
 
-### C. Auditoría Activa de Assets Inexistentes (`missingAssetRefs`)
+### C. Assets Candidatos No Referenciados Restantes (0)
+* Cero assets huérfanos restantes en `public/`.
+
+### D. Auditoría Activa de Assets Inexistentes (`missingAssetRefs`)
 - **En grafo de código alcanzable:** `0 referencias rotas` `[✓ PASS]`
-- **En código no alcanzable:** `0 referencias rotas` `[✓ PASS]`
+- **En assets estáticos:** `0 referencias rotas` `[✓ PASS]`
 
 ---
 
@@ -221,5 +197,5 @@ Archivos de configuración requeridos por el toolchain (mantenidos separados de 
 
 * **Lote 1 (FASE 2B.1):** `[✓ COMPLETADO]` Eliminación de 10 secciones landing obsoletas y `styles/globals.css` (11 módulos eliminados).
 * **Lote 2 (FASE 2B.2):** `[✓ COMPLETADO]` Eliminación de 53 componentes UI no alcanzables y 2 hooks huérfanos (55 módulos eliminados).
-* **Lote 3 (FASE 2B.3):** `[⏳ Pendiente de Autorización]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
+* **Lote 3 (FASE 2B.3):** `[✓ COMPLETADO]` Eliminación de 28 assets estáticos huérfanos en `public/` (preservando `robots.txt` y los 25 assets activos).
 * **Lote 4 (FASE 2B.4):** `[⏳ Pendiente de Autorización]` Poda de 37 dependencias en `package.json` y regeneración limpia de `package-lock.json`.

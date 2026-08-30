@@ -304,9 +304,15 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 - **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
 - **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
-### FASE 2B.3 — Poda de assets estáticos huérfanos [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+### FASE 2B.3 — Poda de assets estáticos huérfanos [✓ COMPLETADA]
 
 **Objetivo:** eliminar 28 assets estáticos huérfanos en `public/` conservando `robots.txt` y los 25 assets activos.
+**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
+**Resultados verificados:**
+- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
+- **Archivos estáticos en `public/` (25):** 25 referenciados + 0 candidatos no referenciados ($25 = 25 + 0$).
+- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
+- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
 
 ### FASE 2B.4 — Poda de dependencias no utilizadas [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
 
@@ -360,7 +366,7 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 La próxima unidad de trabajo es exactamente:
 
-**FASE 2B.3 — Poda de assets estáticos huérfanos**
+**FASE 2B.4 — Poda de dependencias no utilizadas**
 
 ## Prompt exacto para iniciar la primera tarea
 
