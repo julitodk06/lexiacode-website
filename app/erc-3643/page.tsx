@@ -118,7 +118,7 @@ export default function Page() {
                   Desarrollamos contratos inteligentes en Solidity tomando como referencia el estándar ERC-3643, adaptando la lógica de permisos y registros de identidad a los requerimientos de cada iniciativa.
                 </p>
                 <Link
-                  href="/#contacto"
+                  href="/#contact"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Servicios de Desarrollo <ArrowRight className="h-4 w-4" />

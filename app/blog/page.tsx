@@ -359,7 +359,7 @@ export default function BlogPage() {
                   En LexiaCode nos especializamos en arquitectura de producto, smart contracts en Solidity e integraciones de IA para proyectos tecnológicos.
                 </p>
                 <Link
-                  href="/#contacto"
+                  href="/#contact"
                   onClick={() => setSelectedArticleId(null)}
                   className="inline-flex items-center justify-center bg-primary hover:bg-[#e87722] text-white text-xs font-bold font-mono uppercase px-6 py-3 rounded-xl transition-all shadow-md hover:scale-105"
                 >

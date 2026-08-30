@@ -114,7 +114,7 @@ export default function Page() {
                   Diseñamos especificaciones técnicas, desarrollamos smart contracts en Solidity con suites de testing automatizadas y coordinamos los requerimientos funcionales con especialistas legales y de auditoría independientes.
                 </p>
                 <Link
-                  href="/#contacto"
+                  href="/#contact"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Servicios Técnicos

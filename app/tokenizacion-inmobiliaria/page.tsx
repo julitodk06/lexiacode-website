@@ -107,7 +107,7 @@ export default function Page() {
                   Diseñamos contratos inteligentes en Solidity y aplicaciones web para proyectos de Real Estate con enfoque en trazabilidad y calidad de código.
                 </p>
                 <Link
-                  href="/#contacto"
+                  href="/#contact"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Desarrollo Técnico <ArrowRight className="h-4 w-4" />

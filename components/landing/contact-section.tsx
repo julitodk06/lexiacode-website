@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Send, Mail, Building2 } from "lucide-react"
+import { Mail, Building2 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
+import { buildMailtoUrl, buildWhatsAppUrl, OFFICIAL_CONTACT } from "@/lib/contact-links"
 
 export function ContactSection() {
   const { t, language } = useLanguage()
@@ -42,20 +43,27 @@ export function ContactSection() {
   const handleSendEmail = (e: React.FormEvent) => {
     e.preventDefault()
     const assetLabel = selectedAsset ? (currentAssetsList.find((opt) => opt.key === selectedAsset)?.label || selectedAsset) : "No especificado"
-    const subject = encodeURIComponent(`Consulta técnica - ${formData.company || formData.name || "LexiaCode"}`)
-    const body = encodeURIComponent(
-      `Nombre: ${formData.name}\nEmail: ${formData.email}\nOrganización/Iniciativa: ${formData.company}\nTipo de Activo/Proceso: ${assetLabel}\n\nConsulta o requerimiento:\n${formData.message}`
-    )
-    window.location.href = `mailto:juliov@lexiacode.com?subject=${subject}&body=${body}`
+    const mailtoUrl = buildMailtoUrl({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      assetType: assetLabel,
+      message: formData.message,
+    })
+    window.location.href = mailtoUrl
     setOpenedClient(true)
   }
 
   const handleWhatsApp = () => {
     const assetLabel = selectedAsset ? (currentAssetsList.find((opt) => opt.key === selectedAsset)?.label || selectedAsset) : "No especificado"
-    const text = encodeURIComponent(
-      `Hola Julio, te contacto desde la web de LexiaCode.\nNombre: ${formData.name || "No especificado"}\nEmail: ${formData.email || "No especificado"}\nOrganización: ${formData.company || "No especificada"}\nActivo/Interés: ${assetLabel}\nConsulta: ${formData.message || "Quisiera coordinar una evaluación técnica."}`
-    )
-    window.open(`https://wa.me/5493815400016?text=${text}`, "_blank")
+    const waUrl = buildWhatsAppUrl({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      assetType: assetLabel,
+      message: formData.message,
+    })
+    window.open(waUrl, "_blank")
   }
 
   return (
@@ -84,14 +92,14 @@ export function ContactSection() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 bg-secondary/50">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                <span>juliov@lexiacode.com</span>
+                <span>{OFFICIAL_CONTACT.email}</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366]">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" /><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" /></svg>
                 </div>
-                <a href="https://wa.me/5493815400016" target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">
-                  +54 381 540 0016
+                <a href={OFFICIAL_CONTACT.whatsAppBaseUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">
+                  {OFFICIAL_CONTACT.phone}
                 </a>
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -125,13 +133,16 @@ export function ContactSection() {
           {/* Right — Contact Form */}
           <div className="rounded-2xl border border-border/40 bg-card/30 p-8 backdrop-blur-sm shadow-xl shadow-black/10 flex flex-col gap-6">
             <form onSubmit={handleSendEmail} className="space-y-5">
-              <div>
-                <p className="mb-3 text-sm font-medium text-foreground">{language === "en" ? "Type of Asset / Scope:" : language === "pt" ? "Tipo de Ativo / Escopo:" : "Tipo de activo o proceso:"}</p>
+              <fieldset className="border-0 p-0 m-0">
+                <legend className="mb-3 text-sm font-medium text-foreground">
+                  {language === "en" ? "Type of Asset / Scope:" : language === "pt" ? "Tipo de Ativo / Escopo:" : "Tipo de activo o proceso:"}
+                </legend>
                 <div className="flex flex-wrap gap-2">
                   {currentAssetsList.map((opt) => (
                     <button
                       type="button"
                       key={opt.key}
+                      aria-pressed={selectedAsset === opt.key}
                       onClick={() => setSelectedAsset(opt.key)}
                       className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-all ${
                         selectedAsset === opt.key
@@ -143,12 +154,13 @@ export function ContactSection() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">{t.contact.namePlaceholder}</label>
+                  <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">{t.contact.namePlaceholder}</label>
                   <Input
+                    id="contact-name"
                     required
                     placeholder="Ej. Carlos Mendoza"
                     value={formData.name}
@@ -157,8 +169,9 @@ export function ContactSection() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">{t.contact.emailPlaceholder}</label>
+                  <label htmlFor="contact-email" className="text-xs font-medium text-muted-foreground">{t.contact.emailPlaceholder}</label>
                   <Input
+                    id="contact-email"
                     required
                     type="email"
                     placeholder="ejemplo@empresa.com"
@@ -170,8 +183,9 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">{t.contact.companyPlaceholder}</label>
+                <label htmlFor="contact-company" className="text-xs font-medium text-muted-foreground">{t.contact.companyPlaceholder}</label>
                 <Input
+                  id="contact-company"
                   placeholder="Ej. Nombre de empresa / Iniciativa"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
@@ -180,8 +194,9 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">{t.contact.messagePlaceholder}</label>
+                <label htmlFor="contact-message" className="text-xs font-medium text-muted-foreground">{t.contact.messagePlaceholder}</label>
                 <Textarea
+                  id="contact-message"
                   required
                   placeholder="Describe brevemente tu objetivo, iniciativa o requerimiento técnico..."
                   rows={5}
@@ -213,7 +228,7 @@ export function ContactSection() {
               {openedClient && (
                 <div className="p-3.5 rounded-xl border border-primary/30 bg-primary/5 text-xs text-muted-foreground leading-relaxed animate-fadeIn">
                   <p className="font-semibold text-primary mb-1">Información de envío:</p>
-                  Se abrió tu aplicación de correo para completar el envío a <strong className="text-foreground">juliov@lexiacode.com</strong> con los datos cargados. Si no se abrió automáticamente, puedes escribirnos directamente a esa dirección o contactarnos vía WhatsApp.
+                  Se abrió tu aplicación de correo para completar el envío a <strong className="text-foreground">{OFFICIAL_CONTACT.email}</strong> con los datos cargados. Si no se abrió automáticamente, puedes escribirnos directamente a esa dirección o contactarnos vía WhatsApp.
                 </div>
               )}
 
@@ -227,4 +242,3 @@ export function ContactSection() {
     </section>
   )
 }
-

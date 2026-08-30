@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Bot, Cpu, CheckCircle2, Zap, Shield, LineChart, MessageSquare, Server, ArrowRight, Maximize2, X, Sparkles, Lock, FileSpreadsheet, Eye } from "lucide-react"
 import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
@@ -82,11 +83,11 @@ export default function AgentesIAPage() {
                   </div>
                 </div>
                 <div className="pt-4 flex flex-wrap gap-4">
-                  <a href="#contacto">
+                  <Link href="/#contact">
                     <button className="h-12 rounded-xl bg-cyan-500 text-black font-semibold px-8 shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(6,182,212,0.45)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-xs">
-                      Estructurar Proyecto de IA
+                      Coordinar Evaluación Técnica
                     </button>
-                  </a>
+                  </Link>
                   <button 
                     onClick={() => setIsZoomOpen(true)}
                     className="h-12 rounded-xl border border-border/50 bg-background/50 hover:bg-secondary/40 text-foreground font-semibold px-6 transition-all duration-300 flex items-center gap-2 text-xs cursor-pointer"

@@ -35,8 +35,8 @@ export function Header() {
     { label: t.nav.howItWorks, href: "/como-funciona/" },
     { label: t.nav.rwaProjects, href: "/proyectos-rwa/" },
     { label: t.nav.blog, href: "/blog/" },
-    { label: t.nav.security, href: "#security" },
-    { label: t.nav.contact, href: "#contact" },
+    { label: t.nav.security, href: "/#security" },
+    { label: t.nav.contact, href: "/#contact" },
   ]
 
   const currentLang = languages.find(l => l.code === language)
@@ -55,7 +55,7 @@ export function Header() {
         if (el) {
           const rect = el.getBoundingClientRect()
           if (rect.top <= 100 && rect.bottom >= 100) {
-            current = `#${id}`
+            current = `/#${id}`
             break
           }
         }
@@ -68,12 +68,12 @@ export function Header() {
   }, [])
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    const isHash = href.startsWith("#")
+    const isHash = href.startsWith("#") || href.startsWith("/#")
     const isHomePath = isHome
 
     if (isHash && isHomePath) {
       e.preventDefault()
-      const id = href.replace("#", "")
+      const id = href.replace("/#", "").replace("#", "")
       const el = document.getElementById(id)
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -81,7 +81,8 @@ export function Header() {
       setMobileMenuOpen(false)
     } else if (isHash && !isHomePath) {
       e.preventDefault()
-      router.push(`/${href}`)
+      const route = href.startsWith("/") ? href : `/${href}`
+      router.push(route)
       setMobileMenuOpen(false)
     }
   }
@@ -166,10 +167,10 @@ export function Header() {
             size="sm"
             onClick={() => {
               if (isHome) {
-                const el = document.getElementById("contacto")
+                const el = document.getElementById("contact")
                 if (el) el.scrollIntoView({ behavior: "smooth" })
               } else {
-                router.push("/#contacto")
+                router.push("/#contact")
               }
             }}
             className={`font-semibold text-xs border rounded-full px-4 py-2 transition-all duration-300 ${
@@ -186,6 +187,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Seleccionar idioma"
                 className={`flex items-center gap-1.5 transition-colors ${
                   isHeaderDark
                     ? "text-gray-300 hover:text-white hover:bg-white/10"
@@ -222,6 +224,7 @@ export function Header() {
               <Button 
                 variant="ghost" 
                 size="sm" 
+                aria-label="Seleccionar idioma"
                 className={`flex items-center gap-1 transition-colors ${
                   isHeaderDark
                     ? "text-gray-300 hover:text-white hover:bg-white/10"
@@ -247,6 +250,9 @@ export function Header() {
 
           <button
             type="button"
+            aria-label="Abrir menú de navegación"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`rounded-md p-1.5 transition-colors ${
               isHeaderDark
@@ -261,7 +267,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden">
+        <div id="mobile-menu" className="border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden">
           <div className="space-y-1 px-6 py-4">
             {navLinks.map((link) => (
               <a
@@ -284,10 +290,10 @@ export function Header() {
                 onClick={() => {
                   setMobileMenuOpen(false)
                   if (isHome) {
-                    const el = document.getElementById("contacto")
+                    const el = document.getElementById("contact")
                     if (el) el.scrollIntoView({ behavior: "smooth" })
                   } else {
-                    router.push("/#contacto")
+                    router.push("/#contact")
                   }
                 }}
                 className="w-full text-center border-primary/30 text-primary hover:bg-primary/10 rounded-xl py-5 font-semibold text-xs"

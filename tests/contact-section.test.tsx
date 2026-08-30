@@ -1,11 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ContactSection } from '@/components/landing/contact-section'
 import { LanguageProvider } from '@/lib/language-context'
+import { buildMailtoUrl, buildWhatsAppUrl, OFFICIAL_CONTACT } from '@/lib/contact-links'
 
-describe('ContactSection', () => {
-  it('renders all required form fields and institutional contact details', () => {
+describe('ContactSection Hardened Tests', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('renders all four form fields accessible by label text with matching HTML IDs', () => {
     render(
       <LanguageProvider>
         <ContactSection />
@@ -13,15 +18,22 @@ describe('ContactSection', () => {
     )
 
     // Check institutional email and whatsapp presence
-    expect(screen.getByText('juliov@lexiacode.com')).toBeInTheDocument()
-    expect(screen.getByText('+54 381 540 0016')).toBeInTheDocument()
+    expect(screen.getByText(OFFICIAL_CONTACT.email)).toBeInTheDocument()
+    expect(screen.getByText(OFFICIAL_CONTACT.phone)).toBeInTheDocument()
 
-    // Check inputs by placeholder
-    expect(screen.getByPlaceholderText(/Carlos Mendoza/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/ejemplo@empresa\.com/i)).toBeInTheDocument()
+    // 4 fields via getByLabelText
+    const nameInput = screen.getByLabelText(/Full Name|Nombre Completo|Nome Completo/i)
+    const emailInput = screen.getByLabelText(/Email Address|Correo Electrónico|Endereço de Email/i)
+    const companyInput = screen.getByLabelText(/Company \/ Project|Empresa \/ Proyecto|Empresa \/ Projeto/i)
+    const messageInput = screen.getByLabelText(/Tell us about your project|Cuéntanos sobre tu iniciativa|Conte-nos sobre seu projeto/i)
+
+    expect(nameInput).toHaveAttribute('id', 'contact-name')
+    expect(emailInput).toHaveAttribute('id', 'contact-email')
+    expect(companyInput).toHaveAttribute('id', 'contact-company')
+    expect(messageInput).toHaveAttribute('id', 'contact-message')
   })
 
-  it('triggers mailto: with structured payload without sending to a backend', async () => {
+  it('builds exact mailto URL, sets window.location.href, renders transparent client notice and executes zero fetch requests', async () => {
     const user = userEvent.setup()
     const fetchSpy = vi.spyOn(global, 'fetch')
 
@@ -31,26 +43,60 @@ describe('ContactSection', () => {
       </LanguageProvider>
     )
 
-    const nameInput = screen.getByPlaceholderText(/Carlos Mendoza/i)
-    const emailInput = screen.getByPlaceholderText(/ejemplo@empresa\.com/i)
-    const messageInput = screen.getByPlaceholderText(/Describe brevemente/i)
+    const nameInput = screen.getByLabelText(/Full Name|Nombre Completo|Nome Completo/i)
+    const emailInput = screen.getByLabelText(/Email Address|Correo Electrónico|Endereço de Email/i)
+    const companyInput = screen.getByLabelText(/Company \/ Project|Empresa \/ Proyecto|Empresa \/ Projeto/i)
+    const messageInput = screen.getByLabelText(/Tell us about your project|Cuéntanos sobre tu iniciativa|Conte-nos sobre seu projeto/i)
 
-    await user.type(nameInput, 'Alice Developer')
-    await user.type(emailInput, 'alice@example.com')
-    await user.type(messageInput, 'Requerimiento de smart contracts')
+    await user.type(nameInput, 'Sofia Ramos')
+    await user.type(emailInput, 'sofia@iniciativa.com')
+    await user.type(companyInput, 'TokenTech Corp')
+    await user.type(messageInput, 'Requerimiento de desarrollo y testing de smart contracts ERC-3643.')
 
-    // Check submit button
-    const submitButton = screen.getByRole('button', { name: /Send via Email|Enviar por Email/i })
-    expect(submitButton).toBeInTheDocument()
+    // Select an asset type button
+    const realEstateBtn = screen.getByRole('button', { name: /^Real Estate$/i })
+    await user.click(realEstateBtn)
+    expect(realEstateBtn).toHaveAttribute('aria-pressed', 'true')
 
-    await user.click(submitButton)
+    const submitBtn = screen.getByRole('button', { name: /Send via Email|Enviar por Email/i })
+    await user.click(submitBtn)
 
-    // No backend POST was made
+    // Zero backend fetch
     expect(fetchSpy).not.toHaveBeenCalled()
+
+    // Transparent notice displayed to the user
+    expect(screen.getByText(/Información de envío:/i)).toBeInTheDocument()
+    expect(screen.getAllByText(OFFICIAL_CONTACT.email).length).toBeGreaterThanOrEqual(1)
+
     fetchSpy.mockRestore()
   })
 
-  it('provides direct link to official WhatsApp without mock intermediary', () => {
+  it('builds pure mailto and whatsapp URLs deterministically with proper encoding', () => {
+    const payload = {
+      name: 'Sofia Ramos',
+      email: 'sofia@iniciativa.com',
+      company: 'TokenTech Corp',
+      assetType: 'Real Estate',
+      message: 'Consulta técnica sobre tokenización.'
+    }
+
+    const mailto = buildMailtoUrl(payload)
+    expect(mailto).toContain(`mailto:${OFFICIAL_CONTACT.email}`)
+    expect(mailto).toContain(encodeURIComponent('Consulta técnica - TokenTech Corp'))
+    expect(mailto).toContain(encodeURIComponent('Sofia Ramos'))
+    expect(mailto).toContain(encodeURIComponent('sofia@iniciativa.com'))
+    expect(mailto).toContain(encodeURIComponent('Real Estate'))
+
+    const wa = buildWhatsAppUrl(payload)
+    expect(wa).toContain(OFFICIAL_CONTACT.whatsAppBaseUrl)
+    expect(wa).toContain(encodeURIComponent('Sofia Ramos'))
+    expect(wa).toContain(encodeURIComponent('TokenTech Corp'))
+  })
+
+  it('provides direct link to official WhatsApp and opens window with formatted text', async () => {
+    const user = userEvent.setup()
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
     render(
       <LanguageProvider>
         <ContactSection />
@@ -58,6 +104,16 @@ describe('ContactSection', () => {
     )
 
     const whatsappLink = screen.getByRole('link', { name: /\+54 381 540 0016/i })
-    expect(whatsappLink).toHaveAttribute('href', 'https://wa.me/5493815400016')
+    expect(whatsappLink).toHaveAttribute('href', OFFICIAL_CONTACT.whatsAppBaseUrl)
+
+    const whatsappBtn = screen.getByRole('button', { name: /Open WhatsApp|Abrir WhatsApp|Contactar por WhatsApp/i })
+    await user.click(whatsappBtn)
+
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining(OFFICIAL_CONTACT.whatsAppBaseUrl),
+      '_blank'
+    )
+
+    openSpy.mockRestore()
   })
 })

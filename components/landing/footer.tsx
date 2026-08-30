@@ -1,6 +1,6 @@
 "use client"
 
-import { Github, Twitter, Linkedin } from "lucide-react"
+import { Github, Linkedin } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 export function Footer() {
@@ -27,9 +27,8 @@ export function Footer() {
   }
 
   const socials = [
-    { icon: Twitter, label: "Twitter / X", href: "#" },
-    { icon: Linkedin, label: "LinkedIn", href: "#" },
-    { icon: Github, label: "GitHub", href: "#" },
+    { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/julio-antonio-villalobo-770b22296" },
+    { icon: Github, label: "GitHub", href: "https://github.com/julitodk06" },
   ]
 
   return (
@@ -83,6 +82,8 @@ export function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/40 bg-secondary/30 text-muted-foreground transition-all hover:border-primary/40 hover:text-primary hover:bg-primary/5"
                 >
                   <Icon className="h-3.5 w-3.5" />

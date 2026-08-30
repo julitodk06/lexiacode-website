@@ -557,7 +557,7 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-[16px] mt-[24px] w-full sm:w-auto mb-6">
                 <a
-                  href="#contacto"
+                  href="#contact"
                   className="inline-flex items-center justify-center rounded-full bg-[#00f5d4] hover:bg-[#00d1b2] px-8 py-3.5 text-sm font-bold text-[#030712] shadow-[0_0_24px_rgba(0,245,212,0.2)] hover:shadow-[0_0_36px_rgba(0,245,212,0.4)] hover:-translate-y-0.5 transition-all gap-2 w-full sm:w-auto"
                 >
                   Evaluar viabilidad del proyecto
@@ -925,7 +925,7 @@ export default function Home() {
                   Conocé propuestas y trabajos técnicos en distintas etapas, presentados con su estado real y sin implicar operaciones cerradas, financiadas o implementadas integralmente.
                 </p>
               </div>
-              <a href="#contacto" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors shrink-0">
+              <a href="#contact" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors shrink-0">
                 Iniciar mi proyecto <ArrowRight className="h-4 w-4" />
               </a>
             </div>
@@ -1015,7 +1015,7 @@ export default function Home() {
                         </div>
 
                         <a
-                          href="#contacto"
+                          href="#contact"
                           className="hidden lg:inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors shrink-0 group/cta"
                         >
                           Solicitar información
@@ -1174,7 +1174,7 @@ export default function Home() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href="#contacto"
+                href="#contact"
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-9 py-4 text-sm font-bold text-primary-foreground shadow-[0_0_28px_rgba(201,162,39,0.45)] hover:shadow-[0_0_44px_rgba(201,162,39,0.65)] transition-all duration-300 hover:-translate-y-0.5"
               >
                 Evaluar viabilidad del proyecto
@@ -1185,9 +1185,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════ FORMULARIO DE CONTACTO ═══════════════════════ */}
-        <div id="contacto">
-          <ContactSection />
-        </div>
+        <ContactSection />
 
         <Footer />
       </main>
