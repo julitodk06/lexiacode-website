@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Globe, ChevronDown, Sun, Moon } from "lucide-react"
 import {
@@ -12,7 +13,7 @@ import {
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/translations"
 import { useTheme } from "next-themes"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'en', label: 'English', flag: 'EN' },
@@ -28,6 +29,7 @@ export function Header() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   const navLinks = [
     { label: t.nav.howItWorks, href: "/como-funciona/" },
@@ -67,7 +69,7 @@ export function Header() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     const isHash = href.startsWith("#")
-    const isHomePath = typeof window !== "undefined" && (window.location.pathname === "/" || window.location.pathname === "/index.html" || window.location.pathname === "")
+    const isHomePath = isHome
 
     if (isHash && isHomePath) {
       e.preventDefault()
@@ -79,7 +81,8 @@ export function Header() {
       setMobileMenuOpen(false)
     } else if (isHash && !isHomePath) {
       e.preventDefault()
-      window.location.href = `/${href}`
+      router.push(`/${href}`)
+      setMobileMenuOpen(false)
     }
   }
 
@@ -93,7 +96,7 @@ export function Header() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className="flex items-center gap-2.5 group">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 transition-transform group-hover:scale-105">
             <polygon 
               points="50,8 88,30 88,70 50,92 12,70 12,30" 
@@ -128,7 +131,7 @@ export function Header() {
           }`}>
             Lexia<span className="text-primary font-bold">Code</span>
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 lg:flex">
@@ -162,11 +165,11 @@ export function Header() {
             variant="ghost"
             size="sm"
             onClick={() => {
-              if (window.location.pathname === "/" || window.location.pathname === "") {
+              if (isHome) {
                 const el = document.getElementById("contacto")
                 if (el) el.scrollIntoView({ behavior: "smooth" })
               } else {
-                window.location.href = "/#contacto"
+                router.push("/#contacto")
               }
             }}
             className={`font-semibold text-xs border rounded-full px-4 py-2 transition-all duration-300 ${
@@ -266,7 +269,7 @@ export function Header() {
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
                 className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                  activeSection === link.href || (typeof window !== "undefined" && window.location.pathname.includes(link.href) && link.href !== "/")
+                  activeSection === link.href || (pathname?.includes(link.href) && link.href !== "/")
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                 }`}
@@ -280,11 +283,11 @@ export function Header() {
                 size="sm"
                 onClick={() => {
                   setMobileMenuOpen(false)
-                  if (window.location.pathname === "/" || window.location.pathname === "") {
+                  if (isHome) {
                     const el = document.getElementById("contacto")
                     if (el) el.scrollIntoView({ behavior: "smooth" })
                   } else {
-                    window.location.href = "/#contacto"
+                    router.push("/#contacto")
                   }
                 }}
                 className="w-full text-center border-primary/30 text-primary hover:bg-primary/10 rounded-xl py-5 font-semibold text-xs"

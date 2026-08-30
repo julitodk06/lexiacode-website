@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
 import { LanguageProvider } from "@/lib/language-context"
@@ -357,13 +358,13 @@ export default function BlogPage() {
                 <p className="text-sm text-muted-foreground font-light leading-relaxed mb-6">
                   En LexiaCode nos especializamos en arquitectura de producto, smart contracts en Solidity e integraciones de IA para proyectos tecnológicos.
                 </p>
-                <a
+                <Link
                   href="/#contacto"
                   onClick={() => setSelectedArticleId(null)}
                   className="inline-flex items-center justify-center bg-primary hover:bg-[#e87722] text-white text-xs font-bold font-mono uppercase px-6 py-3 rounded-xl transition-all shadow-md hover:scale-105"
                 >
                   Contactar al Equipo <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </div>
           ) : (

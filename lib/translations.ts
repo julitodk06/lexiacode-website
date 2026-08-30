@@ -157,7 +157,7 @@ export const translations = {
       messagePlaceholder: 'Tell us about your project or technical inquiry...',
       submit: 'Send Inquiry',
       successTitle: 'Inquiry Received!',
-      successMessage: 'We will get back to you within 24 hours.',
+      successMessage: 'We will get in touch with you shortly.',
       options: {
         label: 'I am interested in:',
         rwa: 'RWA Product Architecture',
@@ -364,7 +364,7 @@ export const translations = {
       messagePlaceholder: 'Cuéntanos sobre tu iniciativa o consulta técnica...',
       submit: 'Enviar Consulta',
       successTitle: '¡Consulta Recibida!',
-      successMessage: 'Nos pondremos en contacto en menos de 24 horas.',
+      successMessage: 'Nos pondremos en contacto a la brevedad.',
       options: {
         label: 'Me interesa:',
         rwa: 'Arquitectura de Producto RWA',
@@ -571,7 +571,7 @@ export const translations = {
       messagePlaceholder: 'Conte-nos sobre sua iniciativa ou consulta técnica...',
       submit: 'Enviar Consulta',
       successTitle: 'Consulta Recebida!',
-      successMessage: 'Retornaremos em até 24 horas.',
+      successMessage: 'Entraremos em contato em breve.',
       options: {
         label: 'Tenho interesse em:',
         rwa: 'Arquitetura de Produto RWA',

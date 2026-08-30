@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { LanguageProvider } from '@/lib/language-context'
@@ -105,12 +106,12 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   Diseñamos contratos inteligentes en Solidity y aplicaciones web para proyectos de Real Estate con enfoque en trazabilidad y calidad de código.
                 </p>
-                <a
+                <Link
                   href="/#contacto"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Desarrollo Técnico <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
 
             </article>

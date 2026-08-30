@@ -39,24 +39,23 @@ LexiaCode operates strictly as a product and software engineering studio. We ass
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 20.x
-- 
-pm >= 10.x
+- [npm](https://www.npmjs.com/) >= 10.x
 
 ### Installation
 
 Clone the repository and install dependencies using a clean install:
 
-`ash
+```bash
 git clone https://github.com/julitodk06/lexiacode-website.git
 cd lexiacode-website
 npm ci
-`
+```
 
 ### Verification & Quality Checks
 
 Run the verification scripts locally:
 
-`ash
+```bash
 # Run ESLint validation
 npm run lint
 
@@ -65,15 +64,15 @@ npm run typecheck
 
 # Run security audit
 npm audit --audit-level=high
-`
+```
 
 ### Development Server
 
 Start the local development server:
 
-`ash
+```bash
 npm run dev
-`
+```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -81,11 +80,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Create an optimized static build:
 
-`ash
+```bash
 npm run build
-`
+```
 
-This generates a fully static production export in the out/ directory. The contents of out/ can be directly hosted on any static hosting platform (e.g., GitHub Pages, Cloudflare Pages, AWS S3/CloudFront, Hostinger, Vercel, or Nginx/Apache web servers).
+This generates a fully static production export in the `out/` directory. The contents of `out/` can be directly hosted on any static hosting platform (e.g., GitHub Pages, Cloudflare Pages, AWS S3/CloudFront, Hostinger, Vercel, or Nginx/Apache web servers).
 
 ---
 
