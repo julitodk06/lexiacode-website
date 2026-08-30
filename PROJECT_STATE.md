@@ -5,7 +5,7 @@
 > Última revisión arquitectónica: 2026-08-30 (UTC)
 > Repositorio: https://github.com/julitodk06/lexiacode-website
 > Rama activa: **fix/public-repo-hardening**
-> Baseline de código analizada: **b20522be91df6e6b01a250d8407cd1d5ff1d4875**
+> Baseline de código analizada: **af04cb43240631fd820ab677ffe4685cebec7079**
 > Pull request: [Draft PR #1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)
 > Base de comparación: **main** en **9a3210d7881be3d604fe7d48cb94d48029ca7c07**
 
@@ -22,427 +22,208 @@ La rama activa está en proceso de endurecimiento previo a merge. El PR permanec
 | Área | Implementación actual |
 |---|---|
 | Framework | Next.js 16.3.3 con App Router |
-| Lenguaje | TypeScript |
+| Lenguaje | TypeScript 5.7.3 |
 | UI | React 19, Tailwind CSS 4, componentes Radix UI/shadcn, Lucide |
 | Tema y feedback | next-themes y Sonner |
 | Renderizado | Exportación estática mediante **output: export** |
-| Imágenes | Optimización de Next deshabilitada para permitir exportación estática |
+| Imágenes | Optimización de Next deshabilitada (`unoptimized: true`) para permitir exportación estática pura |
 | Persistencia | No existe base de datos |
 | Backend | No existe API activa ni runtime de servidor |
-| Integraciones | Contacto por mailto y WhatsApp; chatbot local determinista |
-| CI | GitHub Actions con Node 20: instalación, ESLint, TypeScript, build y auditoría |
-| Distribución | Artefacto estático generado en **out/**; todavía no desplegado |
+| Integraciones | Contacto directo por mailto (`juliov@lexiacode.com`) y WhatsApp (`+54 381 540 0016`); chatbot local determinista |
+| Testing | Vitest v4 con jsdom, @testing-library/react y user-event (3 suites, 15 tests automatizados) |
+| CI | GitHub Actions con Node 20 LTS: lint, typecheck, tests, build SSG, test:static, reachability audit y npm audit |
+| Distribución | Artefacto estático generado en **out/** (26 documentos HTML + sitemap.xml + robots.txt = 28 endpoints estáticos) |
 
 ### Arquitectura funcional
 
-- **app/** contiene las rutas del App Router y el metadata institucional.
-- **components/landing/** contiene navegación y secciones de presentación.
-- **components/ui/** contiene primitives de interfaz y el chatbot local.
-- **lib/language-context.tsx** administra el idioma activo y su persistencia local.
-- **lib/translations.ts** concentra textos en español, inglés y portugués.
-- **public/** contiene imágenes, logos y robots.txt.
-- **app/sitemap.ts** genera sitemap.xml de manera estática.
+- **app/** contiene las 26 rutas públicas del App Router, layouts de servidor para inyección de metadatos SEO y el metadata institucional global en `layout.tsx`.
+- **components/landing/** contiene navegación, header adaptativo con selector de idiomas y scroll suave, how-it-works con heading configurable, y secciones de presentación.
+- **components/ui/** contiene componentes base accesibles y el chatbot local (`ChatbotWidget`) con diálogo semántico (`role="dialog"`), soporte de tecla Escape y navegación inter-ruta.
+- **lib/contact-links.ts** centraliza la construcción pura y codificada de enlaces `mailto:` y WhatsApp oficiales.
+- **lib/site-metadata.ts** helper centralizado para construcción de metadatos SEO, Open Graph y Twitter Cards por ruta.
+- **lib/language-context.tsx** administra el idioma activo (`es`, `en`, `pt`), persistencia local en `localStorage["lexiacode-lang"]` y sincronización con `document.documentElement.lang`.
+- **lib/translations.ts** concentra textos estructurados en español, inglés y portugués.
+- **public/** contiene imágenes corporativas, diagramas, logos y `robots.txt`.
+- **app/sitemap.ts** genera `sitemap.xml` de manera estática para las 26 rutas del sitio.
+- **scripts/test-static-export.mjs** gate de verificación post-build que analiza 28 endpoints, integridad de links/anchors (resolución contra IDs en HTML) y metadatos SEO.
+- **scripts/audit-reachability.mjs** auditor estático que valida alcanzabilidad de código fuente, assets y dependencias.
 - **.github/workflows/ci.yml** valida cada push a main o fix/* y cada PR hacia main.
 
 ### Módulos 100 % funcionales en el baseline analizado
 
 | Módulo | Estado verificable |
 |---|---|
-| Navegación pública | Las rutas del App Router compilan como páginas estáticas |
-| Sitio trilingüe | Español, inglés y portugués mediante LanguageContext y traducciones locales |
-| Preferencia de idioma | Se conserva en localStorage bajo la clave **lexiacode-lang** |
-| Tema claro/oscuro | Operativo mediante next-themes |
-| Chatbot orientativo | Funciona sin API ni secretos; usa un flujo local determinista |
-| Diagnóstico preliminar | Flujo conversacional por activo, documentación, alcance técnico y etapa |
-| Formulario de contacto | Genera contacto explícito mediante mailto; no simula envíos a servidor |
-| WhatsApp | Enlace directo al número profesional configurado |
-| SEO base | Metadata institucional, robots.txt y sitemap.xml |
-| Exportación estática | Build exitoso con 28 rutas generadas |
-| CI | Run de referencia exitoso: https://github.com/julitodk06/lexiacode-website/actions/runs/33213659521 |
-| Seguridad de dependencias | npm audit reportó 0 vulnerabilidades en el run de referencia |
+| Navegación pública | 26 rutas estáticas compiladas con enlaces internos normalizados a `/#contact` y `#careers` |
+| Sitio trilingüe | Español, inglés y portugués con conmutación dinámica y sincronización de `html lang` |
+| Preferencia de idioma | Se conserva en localStorage bajo la clave **lexiacode-lang** con fallback determinista a `en` |
+| Tema claro/oscuro | Operativo y accesible mediante next-themes en todas las páginas (incluyendo `/sobre-nosotros`) |
+| Chatbot orientativo | Totalmente determinista, accesible por teclado (Escape), con deslinde legal explícito y cero llamadas fetch |
+| Formulario de contacto | Formulario accesible con labels asociados vía `htmlFor`/`id`, aviso transparente de apertura de cliente de correo y cero fetch |
+| WhatsApp | Enlace oficial directo `https://wa.me/5493815400016` con mensaje preformateado |
+| SEO & Open Graph | `metadataBase`, canonicals diferenciados, Open Graph y Twitter Cards en todas las páginas |
+| Exportación estática | Build exitoso con 26 HTML + sitemap.xml + robots.txt = 28 endpoints estáticos en `out/` |
+| Testing automatizado | 15 tests unitarios e integrados (100% pasando sin dependencias de red) |
+| Seguridad de dependencias | npm audit reporta 0 vulnerabilidades |
 
-### Rutas compiladas
+### Rutas compiladas (28 endpoints estáticos)
 
-Las siguientes rutas constituyen el contrato público actual:
-
-- /
-- /agentes-ia
-- /blog
-- /como-funciona
-- /compliance
-- /consultoria-legaltech
-- /descargo-de-responsabilidad
-- /documentacion
-- /erc-3643
-- /faq
-- /guia-tokenizacion
-- /mercado-secundario
-- /politica-de-privacidad
-- /proyectos-rwa
-- /security-tokens
-- /seguridad
-- /servicios
-- /smart-contracts
-- /sobre-nosotros
-- /software-microsaas
-- /terminos-de-servicio
-- /tokenizacion-de-activos
-- /tokenizacion-inmobiliaria
-- /tokenizacion-rwa
-- /whitepaper
-- /sitemap.xml
-- /_not-found
+1. `/` (Home)
+2. `/_not-found`
+3. `/agentes-ia`
+4. `/blog`
+5. `/como-funciona`
+6. `/compliance`
+7. `/consultoria-legaltech`
+8. `/descargo-de-responsabilidad`
+9. `/documentacion`
+10. `/erc-3643`
+11. `/faq`
+12. `/guia-tokenizacion`
+13. `/mercado-secundario`
+14. `/politica-de-privacidad`
+15. `/proyectos-rwa`
+16. `/security-tokens`
+17. `/seguridad`
+18. `/servicios`
+19. `/smart-contracts`
+20. `/sobre-nosotros`
+21. `/software-microsaas`
+22. `/terminos-de-servicio`
+23. `/tokenizacion-de-activos`
+24. `/tokenizacion-inmobiliaria`
+25. `/tokenizacion-rwa`
+26. `/whitepaper`
+27. `/sitemap.xml`
+28. `/robots.txt`
 
 ## Contratos e Interfaces
 
 ### Contrato de ejecución
 
 1. El proyecto debe continuar siendo un sitio **100 % exportable de forma estática**.
-2. No se deben agregar Route Handlers, Server Actions, secretos ni dependencias de runtime servidor sin una decisión arquitectónica explícita.
-3. El comando de producción válido es **npm run build**, que debe crear **out/**.
+2. No se deben agregar Route Handlers, Server Actions, bases de datos ni dependencias de runtime servidor.
+3. El comando de producción válido es **npm run build**, que genera el directorio **out/**.
 4. El repositorio debe poder reconstruirse desde un clon limpio con **npm ci**.
 5. **package-lock.json** debe permanecer sincronizado con **package.json**.
-6. No debe reintroducirse **GEMINI_API_KEY**, **/api/chat**, **send-email.php** ni un falso envío de formulario.
+6. Queda terminantemente prohibida la reintroducción de **GEMINI_API_KEY**, **/api/chat**, **send-email.php** o falsos endpoints de backend.
 
 ### Contratos de navegación pública
 
 - Los enlaces internos deben resolverse con **next/link** o **next/navigation**.
-- Deben preservarse los anchors existentes, especialmente **/#contacto**.
-- Los enlaces externos deben conservar navegación segura y semántica apropiada.
-- No se deben renombrar ni eliminar rutas públicas sin actualizar navegación, sitemap y pruebas de enlaces.
+- El ancla canónica de contacto es estrictamente **/#contact** (correspondiente a `<section id="contact">`). Queda prohibido el uso de `/#contacto` o `#contacto`.
+- El ancla institucional de talento es **#careers** en `/sobre-nosotros/`.
+- No deben existir enlaces placeholder vacíos (`href="#"`, `href=""` o `javascript:`).
+- Los enlaces externos a redes sociales y mensajería deben incluir `target="_blank"` y `rel="noopener noreferrer"`. Enlaces autorizados: LinkedIn oficial y WhatsApp oficial. Se removió Twitter/X por inexistencia de perfil institucional.
 
 ### Contrato de idiomas
 
 - Tipo principal: **Language**, con valores soportados **es**, **en** y **pt**.
 - Contexto: **LanguageContext**.
 - Persistencia: **localStorage["lexiacode-lang"]**.
-- Las claves de traducción utilizadas por componentes alcanzables deben existir en los tres idiomas.
-- No deben quedar mensajes que prometan tiempos de respuesta no garantizados.
+- Sincronización con DOM: `document.documentElement.lang` refleja el idioma activo.
+- Las claves de traducción utilizadas por componentes alcanzables existen en los tres idiomas.
 
-### Contrato del chatbot local
+## Reconciliación de Inventario Reproducible
 
-Tipo conceptual del mensaje:
+Ejecutado mediante `scripts/audit-reachability.mjs`:
 
-~~~ts
-type Message = {
-  id: string
-  text: string
-  sender: "bot" | "user"
-  timestamp: Date
-}
-~~~
+```
+Framework Entrypoints en app/ (35):
+  - 26 app/**/page.tsx
+  - 8 app/**/layout.tsx (incluyendo RootLayout y 7 layouts de metadatos SEO)
+  - 1 app/sitemap.ts
 
-Estados del diagnóstico:
+Config Entrypoints en raíz (4):
+  - next.config.mjs
+  - postcss.config.mjs
+  - eslint.config.mjs
+  - components.json
 
-~~~ts
-type DiagnosticStep =
-  | "none"
-  | "asking-asset"
-  | "asking-docs"
-  | "asking-scope"
-  | "asking-stage"
-  | "result"
+--- Reconciliación de Módulos de Código Fuente ---
+  sourceModulesTotal: 55
+  reachableSourceModules: 55
+  unreachableSourceModules: 0
+  Ecuación: 55 = 55 + 0 -> VERIFICADA [✓]
 
-type DiagnosticData = {
-  assetType?: string
-  docsState?: string
-  techScope?: string
-  devStage?: string
-}
-~~~
+--- Reconciliación de Archivos Estáticos (public/) ---
+  totalPublicAssets: 25
+  referencedPublicAssets: 25
+  unreferencedPublicAssets: 0
+  Ecuación: 25 = 25 + 0 -> VERIFICADA [✓]
 
-Este flujo es informativo y preliminar. No debe convertirse en asesoramiento legal, financiero o de inversión, ni afirmar aprobación regulatoria.
-
-### Contrato de contacto
-
-Estado conceptual del formulario:
-
-~~~ts
-type ContactFormState = {
-  name: string
-  email: string
-  company: string
-  message: string
-}
-~~~
-
-Canales públicos actuales:
-
-- Email: **juliov@lexiacode.com**
-- Teléfono visible: **+54 381 540 0016**
-- WhatsApp: **https://wa.me/5493815400016**
-- LinkedIn: **https://www.linkedin.com/in/julio-antonio-villalobo-770b22296**
-- GitHub: **https://github.com/julitodk06**
-- Web: **https://lexiacode.com**
-
-El formulario no tiene backend. La interfaz debe comunicar de manera transparente que abre el cliente de correo o WhatsApp.
-
-### Datos y APIs
-
-- **Base de datos:** ninguna.
-- **Esquemas de BD:** no aplican.
-- **APIs propias:** ninguna.
-- **DTOs de red:** no aplican.
-- **Autenticación:** ninguna.
-- **Pagos, custodia o emisión:** ninguno.
-
-Agregar cualquiera de estos elementos cambia materialmente la arquitectura y requiere una fase separada, threat model, manejo de secretos, observabilidad y autorización expresa.
-
-### Contrato institucional y de exactitud
-
-Estas reglas son invariantes de contenido:
-
-- LexiaCode se presenta como estudio de producto y tecnología liderado por Julio Antonio Villalobo.
-- No se deben inventar socios, empleados, clientes, autorizaciones, certificaciones, auditorías externas, métricas, retornos, capital captado ni operaciones cerradas.
-- No se debe presentar a LexiaCode como estudio jurídico, entidad regulada, intermediario financiero, fiduciario, custodio o plataforma de inversión.
-- Smart contracts: es defendible afirmar diseño, escritura, modificación, pruebas y revisión de lógica y riesgos comunes; no una auditoría senior independiente ni seguridad absoluta.
-- LexiaCode OS: dirección de producto, arquitectura funcional, coordinación, QA, seguridad y entrega por etapas; no afirmar que cada componente fue programado personalmente.
-- Minería: solo una iniciativa propuesta sobre un activo valuado aproximadamente en USD 100 millones; trabajo preliminar de estructuración RWA/tokenización y due diligence; se recomendó no avanzar por riesgos legales y de contraparte.
-- Turismo y real estate: propuestas preliminares que llegaron a conversaciones comerciales; la formación de capital no se completó.
-- Inglés: **Business English**, con estudio y práctica diaria; no fluidez nativa.
-- Formación en programación de 2020 en la Universidad Nacional de Tucumán: estudios, no título universitario completo.
-- Diferenciar siempre trabajo personal, coordinación, trabajo del equipo y uso de herramientas de IA.
-
-## Deuda Técnica y Errores
-
-### Prioridad P0 — bloquea el cierre del PR
-
-| Hallazgo | Evidencia | Impacto |
-|---|---|---|
-| ESLint termina con 11 warnings | Siete páginas usan anchors internos; header.tsx tiene tres redirecciones internas por window.location.href y un anchor interno | CI verde pero calidad incompleta; navegación no idiomática |
-| CI permite warnings | Script actual: **eslint .** | Nuevos warnings pueden entrar sin bloquear |
-| README con Markdown roto | Bloques de comandos usan cercas incorrectas y aparece **pm >= 10.x** | Onboarding defectuoso |
-| Script de start incompatible | **next start** no corresponde a un proyecto con **output: export** | Contrato operativo engañoso |
-| Traducciones obsoletas | Mensajes ES/PT prometen respuesta en 24 horas aunque el envío remoto fue eliminado | Promesa no defendible y texto muerto |
-| Actions con runtime deprecado | checkout@v4 y setup-node@v4 generan advertencias | Deuda inmediata de CI |
-| ESLint no soportado por el entorno | npm reporta advertencia para eslint@9.39.5 | Toolchain ruidosa y potencialmente frágil |
-
-Warnings de ESLint identificados:
-
-- app/blog/page.tsx:360
-- app/erc-3643/page.tsx:119
-- app/mercado-secundario/page.tsx:97
-- app/security-tokens/page.tsx:110
-- app/tokenizacion-de-activos/page.tsx:115
-- app/tokenizacion-inmobiliaria/page.tsx:108
-- app/tokenizacion-rwa/page.tsx:104
-- components/landing/header.tsx:82
-- components/landing/header.tsx:96
-- components/landing/header.tsx:169
-- components/landing/header.tsx:287
-
-Traducciones obsoletas identificadas:
-
-- lib/translations.ts:367 — promesa ES de respuesta en menos de 24 horas.
-- lib/translations.ts:574 — promesa PT de respuesta en hasta 24 horas.
-
-### Prioridad P1 — mantenimiento y cobertura
-
-| Hallazgo | Estado |
-|---|---|
-| Código no alcanzable | Análisis estático preliminar: 65 de 113 módulos no aparecen alcanzables desde las rutas actuales |
-| Secciones landing antiguas | benefits, faq-section, featured-project, hero, lead-magnet-section, pain-points, platform-demo, press-section, security y services requieren clasificación y posible eliminación |
-| Assets sin referencia | Se identificaron 24 archivos públicos posiblemente huérfanos; deben validarse antes de borrar |
-| Dependencias sobredimensionadas | package.json declara 49 dependencias y el lock instala 513 paquetes; varias parecen no importadas |
-| Sin tests automatizados | CI solo cubre lint, tipos, build y audit; no existen pruebas unitarias, de componentes ni E2E |
-| Sin verificación de enlaces | No hay prueba que detecte rutas internas rotas, anchors faltantes o enlaces externos inválidos |
-
-Las dependencias y assets solo deben eliminarse después de una verificación de alcance, build y búsqueda de referencias. No se autoriza una limpieza masiva a ciegas.
-
-### Prioridad P2 — gobierno y operación
-
-| Hallazgo | Riesgo o condición |
-|---|---|
-| main sin protección | Un push directo podría omitir revisión y checks |
-| Historial conserva archivos eliminados | La rama quitó assets y código problemático del árbol actual, pero permanecen en commits anteriores; reescribir historial requiere autorización explícita y force push |
-| Sin despliegue validado | Todavía no existe evidencia de preview o producción para esta versión |
-| Sin smoke test de hosting estático | Debe comprobarse navegación real, 404, sitemap y assets en el proveedor elegido |
+--- Reconciliación de Dependencias de Producción ---
+  declaredProductionDependencies: 12
+  directlyImported: 10
+  indirectlyRequired: 2 (postcss, tailwindcss-animate)
+  unreferencedCandidates: 0
+  Ecuación: 12 = 10 + 2 + 0 -> VERIFICADA [✓]
+```
 
 ## Roadmap de Fases Atómicas
 
-Cada fase debe ejecutarse sobre una rama específica, producir un commit revisable y terminar con criterios objetivos. No avanzar a la siguiente fase si la anterior falla.
-
 ### FASE 1 — Cierre de calidad del PR #1 [✓ COMPLETADA]
+- Corrección de ESLint, TypeScript, CI workflow y documentación base.
 
-**Objetivo:** dejar el PR actual sin warnings, con documentación operativa correcta y CI determinista.
-**Estado:** COMPLETADA en SHA `b20522be91df6e6b01a250d8407cd1d5ff1d4875`.
-**Resultados verificados:**
-- `npm ci`: Código 0 (505 paquetes auditados).
-- `npm run lint`: Código 0 (0 errores, 0 warnings con `--max-warnings=0`).
-- `npm run typecheck`: Código 0.
-- `npm run build`: Código 0 (28 rutas estáticas exportadas).
-- `npm audit --audit-level=high`: Código 0 (0 vulnerabilidades).
-- CI Run 33289008319 en GitHub Actions: Exitoso (verde).
-
-### FASE 2A / 2A.1 — Inventario reproducible y reconciliado de código, assets y dependencias [✓ COMPLETADA]
-
-**Objetivo:** construir un inventario auditable, determinista y matemáticamente reconciliado sin modificar el código ni eliminar archivos.
-**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md` y `scripts/audit-reachability.mjs`.
-**Resultados reconciliados verificados:**
-- **Módulos de código fuente (112):** 46 alcanzables + 66 candidatos no alcanzables ($112 = 46 + 66$).
-- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$). `public/robots.txt` clasificado como entrypoint público `CONSERVAR`.
-- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas (`react-dom`, `autoprefixer`) + 37 candidatas a poda ($49 = 10 + 2 + 37$).
-- **Auditoría de integridad:** 0 imports locales rotos, 0 referencias a assets inexistentes en código alcanzable.
+### FASE 2A / 2A.1 — Inventario reproducible de alcanzabilidad [✓ COMPLETADA]
+- Construcción del script determinista `scripts/audit-reachability.mjs` e informe `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
 
 ### FASE 2B.1 — Poda de secciones landing obsoletas [✓ COMPLETADA]
-
-**Objetivo:** eliminar los primeros 11 módulos huérfanos confirmados (10 secciones landing obsoletas y `styles/globals.css`).
-**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
-**Resultados verificados:**
-- **Módulos de código fuente (101):** 46 alcanzables + 55 candidatos no alcanzables ($101 = 46 + 55$).
-- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$).
-- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
-- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
+- Eliminación de 11 módulos huérfanos confirmados (10 secciones obsoletas + `styles/globals.css`).
 
 ### FASE 2B.2 — Poda de componentes UI no alcanzables [✓ COMPLETADA]
-
-**Objetivo:** eliminar 53 componentes UI de `components/ui/` no importados por ninguna página activa y 2 hooks auxiliares (`hooks/use-mobile.ts`, `hooks/use-toast.ts`).
-**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
-**Resultados verificados:**
-- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
-- **Archivos estáticos en `public/` (53):** 25 referenciados + 28 candidatos no referenciados ($53 = 25 + 28$).
-- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
-- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
+- Eliminación de 53 componentes UI no utilizados y 2 hooks huérfanos.
 
 ### FASE 2B.3 — Poda de assets estáticos huérfanos [✓ COMPLETADA]
-
-**Objetivo:** eliminar 28 assets estáticos huérfanos en `public/` conservando `robots.txt` y los 25 assets activos.
-**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
-**Resultados verificados:**
-- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
-- **Archivos estáticos en `public/` (25):** 25 referenciados + 0 candidatos no referenciados ($25 = 25 + 0$).
-- **Dependencias de producción (49):** 10 directamente importadas + 2 indirectamente requeridas + 37 candidatas a poda ($49 = 10 + 2 + 37$).
-- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
+- Eliminación de 28 assets huérfanos en `public/` preservando `robots.txt` y los 25 activos.
 
 ### FASE 2B.4 — Poda de dependencias no utilizadas [✓ COMPLETADA]
-
-**Objetivo:** desinstalar 37 dependencias de producción no utilizadas en `package.json` y regenerar `package-lock.json`.
-**Estado:** COMPLETADA en `docs/PHASE_2A_REACHABILITY_AUDIT.md`.
-**Resultados verificados:**
-- **Módulos de código fuente (46):** 46 alcanzables + 0 no alcanzables ($46 = 46 + 0$).
-- **Archivos estáticos en `public/` (25):** 25 referenciados + 0 candidatos no referenciados ($25 = 25 + 0$).
-- **Dependencias de producción (12):** 10 directamente importadas + 2 indirectamente requeridas + 0 candidatas a poda ($12 = 10 + 2 + 0$).
-- **Paquetes auditados:** Reducción de 506 paquetes iniciales a 413 paquetes en el árbol de dependencias.
-- **Validaciones:** 0 imports rotos, 0 assets faltantes en código activo, ESLint 0 warnings, TypeScript código 0, Build 28 rutas estáticas, 0 vulnerabilidades.
-
----
-
-## RESUMEN GLOBAL DE LA FASE 2B: PODA SEGURA [✓ COMPLETADA]
-
-* **Lote 1 (FASE 2B.1):** 11 módulos eliminados (10 secciones landing obsoletas + `styles/globals.css`).
-* **Lote 2 (FASE 2B.2):** 55 módulos eliminados (53 componentes UI no utilizados + 2 hooks huérfanos).
-* **Lote 3 (FASE 2B.3):** 28 assets estáticos huérfanos eliminados en `public/` (conservando `robots.txt` y 25 activos).
-* **Lote 4 (FASE 2B.4):** 37 dependencias no utilizadas desinstaladas de `package.json`.
-* **Reducción de código:** 66 módulos fuente eliminados, 28 assets eliminados, 37 dependencias de producción eliminadas, 93 paquetes npm reducidos.
-
----
+- Desinstalación de 37 dependencias no utilizadas en `package.json`.
 
 ### FASE 3 — Cobertura automatizada mínima [✓ COMPLETADA]
+- Creación del entorno de test con Vitest, jsdom, testing-library y gate de exportación estática.
 
-**Objetivo:** detectar regresiones funcionales antes del merge.
-**Estado:** COMPLETADA y documentada en `docs/PHASE_3_TEST_REPORT.md`.
-**Entregables implementados:**
-1. **Tests unitarios e integración (`tests/`):**
-   - `tests/language-context.test.tsx` (4 tests: inicial, conmutación es/en/pt, persistencia en localStorage con clave `lexiacode-lang`, fallback seguro).
-   - `tests/chatbot-widget.test.tsx` (3 tests: render/toggle, dudas interactivas, ausencia de `fetch`/API keys/GEMINI, deslinde orientativo preliminar).
-   - `tests/contact-section.test.tsx` (3 tests: campos de formulario, email `juliov@lexiacode.com`, WhatsApp `+54 381 540 0016`, mailto estructurado sin backend).
-2. **Gate de export estático (`scripts/test-static-export.mjs`):**
-   - Verifica existencia de `out/`, 28 rutas estáticas, `sitemap.xml`, `robots.txt`, ancla `/#contact` y ausencia de `/api/chat`, `send-email.php`, `GEMINI_API_KEY`.
-3. **Scripts en `package.json`:** `test`, `test:run`, `test:static`.
-4. **CI Workflow (`.github/workflows/ci.yml`):** Integra `lint` -> `typecheck` -> `test:run` -> `build` -> `test:static` -> `audit:reachability` -> `audit`.
+### FASE 3.1 — Corrección de gates y regresiones detectadas [✓ COMPLETADA]
+- Normalización canónica de anclas a `/#contact`.
+- Eliminación de Twitter/X y enlaces `href="#"` en footer; inclusión de LinkedIn oficial y GitHub.
+- Creación de `lib/contact-links.ts` con funciones puras `buildMailtoUrl` y `buildWhatsAppUrl`.
+- Endurecimiento de accesibilidad en `ContactSection` y `ChatbotWidget` (roles, Escape key, foco).
+- Suite de pruebas ampliada a 15 tests automatizados (100% pasando).
+- Endurecimiento de `scripts/test-static-export.mjs` con validación de links, anchors y assets locales en `out/`.
+- Documentado en `docs/PHASE_3_TEST_REPORT.md`.
 
----
+### FASE 4A — Auditoría estática de accesibilidad, SEO y contenido [✓ COMPLETADA]
+- Auditoría de solo lectura documentada en `docs/PHASE_4A_ACCESSIBILITY_SEO_CONTENT_AUDIT.md`.
 
-### FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones [✓ COMPLETADA]
-
-**Objetivo:** auditoría integral de lectura y análisis de la web estática exportada y su código fuente sin modificar lógica, texto ni estilos.
-**Estado:** COMPLETADA y documentada en `docs/PHASE_4A_ACCESSIBILITY_SEO_CONTENT_AUDIT.md`.
-**Veredicto:** `GO PARA FASE 4B`.
-**Resumen de Hallazgos:**
-- **Accesibilidad (P1):** Falta de `<h1>` en `/como-funciona`; clases de color hardcodeadas en `/sobre-nosotros` que requieren adaptación temática a dark mode.
-- **SEO (P2):** 7 páginas especializadas sin exportar objeto `metadata` individual (`/agentes-ia`, `/blog`, `/consultoria-legaltech`, `/guia-tokenizacion`, `/proyectos-rwa`, `/smart-contracts`, `/software-microsaas`); falta de canonical y Open Graph completos en `RootLayout`.
-- **Navegación (P2):** Normalización de scroll/redirección hacia `/#contact` desde rutas secundarias en el chatbot.
-- **Contenido (P1/P2):** Ratificación de afirmaciones sobre estudio de producto/tecnología, iniciativa minera (~USD 100M, recomendación de no avanzar por riesgos, no captación) y perfil profesional.
+### FASE 4B — Corrección de accesibilidad, SEO y contenido [✓ COMPLETADA]
+- Inclusión de `asPageHeading?: boolean` en `HowItWorks` y `app/como-funciona/page.tsx` para garantizar un único `<h1>`.
+- Migración integral de `/sobre-nosotros` a tokens semánticos adaptativos (`bg-background`, `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`).
+- Inyección de metadatos SEO globales en `app/layout.tsx` (`metadataBase`, canonicals, OG, Twitter).
+- Creación de `lib/site-metadata.ts` y 7 layouts de servidor (`layout.tsx`) para páginas cliente.
+- Refuerzo de claims institucionales defendibles (iniciativa minera con valuación de referencia de ~USD 100M del activo subyacente analizado, estudio de producto/tecnología y perfil profesional).
+- Validación de metadatos SEO en `scripts/test-static-export.mjs`.
+- Documentado en `docs/PHASE_4B_CORRECTION_REPORT.md`.
 
 ---
 
-### FASE 4B — Corrección de accesibilidad, SEO y contenido [⏳ PENDIENTE DE REVISIÓN Y AUTORIZACIÓN]
+## Próxima Tarea Pendiente
 
-**Objetivo:** ejecutar las correcciones identificadas en el informe `docs/PHASE_4A_ACCESSIBILITY_SEO_CONTENT_AUDIT.md`.
+La próxima unidad de trabajo es:
 
----
+**FASE 5 — Gobierno del repositorio y preparación controlada del PR**
 
-## Primera tarea pendiente
-
-La próxima unidad de trabajo es exactamente:
-
-**FASE 4B — Corrección de accesibilidad, SEO y contenido**
-
-1. Validar jerarquía de headings, nombres accesibles, contraste y teclado.
-2. Verificar canonical, Open Graph, sitemap, robots y datos estructurados.
-3. Revisar las tres traducciones y eliminar claves muertas.
-4. Verificar que toda afirmación respete el contrato institucional.
-
-**Aceptación:** informe por ruta crítica, cero errores críticos de accesibilidad y cero claims no defendibles.
-
-### FASE 5 — Gobierno del repositorio
-
-**Objetivo:** proteger la fuente de verdad después de aprobar el PR.
-
-1. Decidir si es necesario sanear historial; no hacerlo sin autorización.
-2. Definir protección de main, revisión requerida y checks obligatorios.
-3. Documentar estrategia de ramas, releases y rollback.
-4. Convertir el PR a Ready solo con autorización del propietario.
-
-**Aceptación:** reglas de rama verificadas, proceso de release documentado y ninguna reescritura destructiva no autorizada.
-
-### FASE 6 — Preview y despliegue controlado
-
-**Objetivo:** publicar el export estático con validación previa.
-
-1. Crear preview aislado.
-2. Ejecutar smoke tests reales de navegación, assets, 404, sitemap y formularios.
-3. Obtener autorización explícita de producción.
-4. Desplegar y verificar dominio, TLS, analytics consentidos y rollback.
-
-**Aceptación:** preview aprobado, producción autorizada, verificación post-deploy y plan de reversión probado.
-
-## Primera tarea pendiente
-
-La próxima unidad de trabajo es exactamente:
-
-**FASE 3 — Cobertura automatizada mínima**
+1. Revisar estado y protección de la rama `main`.
+2. Preparar el Pull Request #1 para revisión final.
+3. Documentar estrategia de release y rollback para despliegue estático.
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 2B.3 — Poda de assets estáticos huérfanos” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website, siguiendo el inventario de docs/PHASE_2A_REACHABILITY_AUDIT.md.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5 — Gobierno del repositorio y preparación controlada del PR” definida en PROJECT_STATE.md del repositorio público julitodk06/lexiacode-website.
 
 Antes de modificar:
-1. Lee PROJECT_STATE.md y docs/PHASE_2A_REACHABILITY_AUDIT.md completos.
+1. Lee PROJECT_STATE.md, docs/PHASE_3_TEST_REPORT.md y docs/PHASE_4B_CORRECTION_REPORT.md completos.
 2. Confirma que estás en la rama fix/public-repo-hardening y que el PR #1 sigue Draft.
 3. Registra el SHA inicial y ejecuta git status.
-4. No trabajes sobre main y no crees otra rama.
-5. No hagas merge, deploy, force push, cambios de DNS, variables de entorno ni secretos.
-
-Implementa:
-- Eliminar los 28 assets estáticos huérfanos en public/ identificados en el inventario.
-- Preservar public/robots.txt y los 25 assets referenciados.
-- No modificar package.json ni dependencias en esta fase.
-
-Validación obligatoria:
-- git diff --check
-- npm ci
-- npm run audit:reachability
-- npm run lint
-- npm run typecheck
-- npm run build (28 rutas estáticas)
-- npm audit --audit-level=high
-
-Al terminar:
-1. Muestra el diff resumido y los resultados exactos de validación.
-2. Haz un único commit con mensaje: chore: prune unreferenced static assets (phase 2b.3)
-3. Push únicamente a fix/public-repo-hardening.
-4. Espera y verifica el GitHub Actions run asociado.
-5. Mantén el PR #1 en Draft. No lo fusiones ni despliegues.
+4. No trabajes sobre main y no crees otra rama sin autorización.
+5. No hagas merge, deploy ni force push.
 ~~~

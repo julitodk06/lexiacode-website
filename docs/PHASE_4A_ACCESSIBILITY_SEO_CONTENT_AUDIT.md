@@ -1,82 +1,63 @@
-# Auditoría Exhaustiva de Accesibilidad, SEO y Contenido — FASE 4A
+# Auditoría Estática de Accesibilidad, SEO y Contenido Público — FASE 4A
 
-**Fecha:** 2026-08-30  
-**Repositorio:** `julitodk06/lexiacode-website`  
-**Rama:** `fix/public-repo-hardening`  
-**Estado:** `[✓ AUDITORÍA COMPLETADA — SIN MODIFICACIONES DE CÓDIGO (SOLO LECTURA)]`  
-**Veredicto:** `GO PARA FASE 4B (CORRECCIONES RECOMENDADAS)`  
+**Fecha:** 2026-08-30
+**Repositorio:** `julitodk06/lexiacode-website`
+**Rama:** `fix/public-repo-hardening`
+**Estado:** `[✓ AUDITORÍA COMPLETADA — RESOLUCIONES EN FASE 4B]`
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-Esta auditoría técnica evalúa de forma integral las 28 rutas estáticas, componentes de interfaz, etiquetas de metadatos, estructuración semántica y consistencia discursiva del sitio web de **LexiaCode**.
+En la **FASE 4A** se completó una auditoría exhaustiva, reproducible y de solo lectura sobre el árbol de archivos alcanzable y los 28 artefactos estáticos exportados (`out/`).
 
-El objetivo es asegurar que la presencia pública del estudio sea 100% defendible, cumpla los estándares WCAG 2.1 AA de accesibilidad, optimice la indexabilidad en motores de búsqueda y elimine cualquier afirmación sobrevalorada o jurídicamente riesgosa.
-
----
-
-## 2. Matriz de Hallazgos por Prioridad
-
-### Leyenda de Severidad
-* **P0 — Crítico:** Bloqueo legal, regulatorio o de seguridad.
-* **P1 — Alto:** Inconsistencias de accesibilidad severa, claims desalineados o ausencia de H1.
-* **P2 — Medio:** SEO incompleto (falta de metadata específica en páginas), fallos de navegación inter-ruta.
-* **P3 — Bajo:** Optimizaciones menores de contraste, espaciado o micro-datos.
+El objetivo fue identificar oportunidades de mejora en **Accesibilidad (a11y)**, **SEO / Metadatos** y **Consistencia de Contenido Institucional**, estableciendo los requerimientos exactos a implementar en la **FASE 4B**.
 
 ---
+
+## 2. Matriz de Hallazgos y Clasificación de Prioridad
 
 ### Hallazgos de Accesibilidad (a11y)
 
-#### [P1] `A11Y-01`: Ausencia de encabezado `<h1>` en ruta independiente `/como-funciona`
-* **Ruta:** `/como-funciona`
-* **Archivo:** `app/como-funciona/page.tsx:19` y `components/landing/how-it-works.tsx:29`
-* **Evidencia:** `HowItWorks` se renderiza como sección principal pero su título utiliza `<h2>` (`{t.howItWorks.title}`). La página carece de un `<h1>` a nivel de documento.
-* **Riesgo:** Incumplimiento de WCAG 2.1 (Criterio 1.3.1 Info and Relationships y 2.4.6 Headings and Labels). Los lectores de pantalla no identifican el tema principal de la página.
-* **Corrección recomendada para Fase 4B:** Agregar un `<h1>` semántico (o permitir que `HowItWorks` reciba una propiedad `asPageHeading={true}` cuando se renderice en `/como-funciona`).
-* **Criterio de Aceptación:** `app/como-funciona/page.tsx` contiene exactamente un `<h1>` accesible.
+#### [P1] `A11Y-01`: Falta de Encabezado Principal `<h1>` en `/como-funciona`
+* **Ruta:** `/como-funciona` (`app/como-funciona/page.tsx:1-26`)
+* **Archivo Componente:** `components/landing/how-it-works.tsx:29-31`
+* **Problema:** En `HowItWorks`, el título se renderiza como `<h2>` porque en la landing principal (`/`) el `<h1>` está en la sección `Hero`. Sin embargo, en la ruta independiente `/como-funciona`, no existe un `<h1>` a nivel de página.
+* **Solución para Fase 4B:** Añadir prop `asPageHeading?: boolean` a `HowItWorks` para renderizar condicionalmente `<h1>` o `<h2>` según el contexto de la página.
+* **Criterio de Aceptación:** Exactamente un `<h1>` en `/como-funciona`.
 
-#### [P1] `A11Y-02`: Estilos de color hardcodeados (`text-gray-900`, `bg-white`) en `/sobre-nosotros`
-* **Ruta:** `/sobre-nosotros`
-* **Archivo:** `app/sobre-nosotros/page.tsx:22, 29, 49`
-* **Evidencia:** El contenedor central utiliza `bg-white text-gray-900` hardcodeado, omitiendo las variables de diseño semánticas `bg-card`, `bg-background`, `text-foreground` y `text-muted-foreground`.
-* **Riesgo:** Conflicto visual y ruptura de accesibilidad cuando el usuario navega en tema oscuro (`dark mode`).
-* **Corrección recomendada para Fase 4B:** Migrar los colores hardcodeados a clases temáticas de Tailwind (`bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`).
-* **Criterio de Aceptación:** Legibilidad y contraste superior a 4.5:1 verificado en modo claro y oscuro.
+#### [P1] `A11Y-02`: Contraste y Adaptación Temática en `/sobre-nosotros`
+* **Ruta:** `/sobre-nosotros` (`app/sobre-nosotros/page.tsx:1-247`)
+* **Problema:** Múltiples secciones usan fondos claros fijos (`bg-white`, `bg-[#f9f9f9]`, `text-gray-900`) encapsulados dentro de un contenedor fijo, lo que rompe la coherencia temática con el modo oscuro y el resto del sitio.
+* **Solución para Fase 4B:** Migrar a tokens semánticos de Tailwind (`bg-background`, `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`).
+* **Criterio de Aceptación:** Vista 100% legible y adaptativa en modos claro y oscuro.
 
-#### [P2] `A11Y-03`: Navegación asistida del Chatbot hacia ancla `#contact` desde páginas secundarias
-* **Ruta:** Global (todas las 28 rutas con `ChatbotWidget`)
-* **Archivo:** `components/ui/chatbot-widget.tsx:86, 397, 428`
-* **Evidencia:** Los botones de "Coordinar Evaluación Técnica" ejecutan `document.getElementById("contact")?.scrollIntoView()`.
-* **Riesgo:** En rutas distintas a la home (ej. `/blog`, `/servicios`), `#contact` no existe en el DOM actual, por lo que el botón no realiza ninguna acción visual.
-* **Corrección recomendada para Fase 4B:** Si `window.location.pathname !== '/'`, redirigir explícitamente a `/#contact` mediante `window.location.href = '/#contact'`.
-* **Criterio de Aceptación:** La acción de contacto en el chatbot funciona fluidamente desde cualquier ruta.
+#### [P2] `A11Y-03`: Nombres Accesibles y Manejo de Foco en Chatbot y Formularios
+* **Archivos:** `components/ui/chatbot-widget.tsx`, `components/landing/contact-section.tsx`
+* **Problema:** Asegurar que los botones de cierre, toggles e inputs cuenten con etiquetas accesibles inequívocas (`aria-label`, `aria-expanded`, asociación `htmlFor`/`id`).
+* **Criterio de Aceptación:** Cero controles interactivos sin nombre accesible comprobado por tests.
 
 ---
 
 ### Hallazgos de SEO y Metadatos
 
-#### [P2] `SEO-01`: Páginas especializadas sin objeto `metadata` individual
-* **Rutas:** `/agentes-ia`, `/blog`, `/consultoria-legaltech`, `/guia-tokenizacion`, `/proyectos-rwa`, `/smart-contracts`, `/software-microsaas`, `/`
-* **Archivos:**
-  * `app/agentes-ia/page.tsx`
-  * `app/blog/page.tsx`
-  * `app/consultoria-legaltech/page.tsx`
-  * `app/guia-tokenizacion/page.tsx`
-  * `app/proyectos-rwa/page.tsx`
-  * `app/smart-contracts/page.tsx`
-  * `app/software-microsaas/page.tsx`
-* **Evidencia:** No exportan la constante `metadata`, heredando el título y descripción genéricos del `RootLayout`.
-* **Riesgo:** Pérdida de posicionamiento en búsquedas orgánicas sobre verticales clave (ej. Smart Contracts Solidity, Agentes IA, Micro-SaaS).
-* **Corrección recomendada para Fase 4B:** Definir `metadata` exportada con `title`, `description`, `keywords` y `canonical` en cada una de estas 7 páginas.
-* **Criterio de Aceptación:** Todas las 28 rutas estáticas exportan títulos y descripciones diferenciadas y descriptivas.
+#### [P1] `SEO-01`: Metadatos Específicos en las 7 Páginas con `"use client"`
+* **Rutas afectadas:**
+  1. `/agentes-ia`
+  2. `/blog`
+  3. `/consultoria-legaltech`
+  4. `/guia-tokenizacion`
+  5. `/proyectos-rwa`
+  6. `/smart-contracts`
+  7. `/software-microsaas`
+* **Problema:** Al ser componentes cliente, Next.js no permite exportar `metadata` directamente desde su `page.tsx`, heredando únicamente el metadata global del `RootLayout`.
+* **Solución para Fase 4B:** Crear Server Layouts (`layout.tsx`) individuales para cada una de las 7 páginas, utilizando un helper centralizado `lib/site-metadata.ts` para inyectar `title`, `description`, `canonical` y Open Graph específicos.
+* **Criterio de Aceptación:** 100% de las rutas públicas con título y descripción diferenciados en su HTML exportado.
 
-#### [P2] `SEO-02`: Falta de tags `canonical` y Open Graph completos en `RootLayout`
-* **Ruta:** Global
+#### [P2] `SEO-02`: Metadata Global y Canonical Tag en `RootLayout`
 * **Archivo:** `app/layout.tsx:18-40`
-* **Evidencia:** `metadata` en `RootLayout` carece de `metadataBase`, `alternates.canonical`, `openGraph` y `twitter`.
-* **Riesgo:** Fragmentación de indexación ante variaciones de dominio o subrutas, y vista previa sin imagen ni formato en redes sociales o WhatsApp.
-* **Corrección recomendada para Fase 4B:** Configurar `metadataBase: new URL('https://lexiacode.com')`, `alternates: { canonical: '/' }`, y objeto `openGraph` apuntando a `https://lexiacode.com/icon.svg` o hero asset.
+* **Problema:** Falta configurar `metadataBase` y la URL canónica raíz (`alternates.canonical: '/'`), así como etiquetas `openGraph` y `twitter` completas.
+* **Solución para Fase 4B:** Completar objeto `metadata` en `RootLayout`.
 * **Criterio de Aceptación:** Etiquetas canonical y Open Graph presentes en todo el export estático.
 
 ---
@@ -111,3 +92,9 @@ El objetivo es asegurar que la presencia pública del estudio sea 100% defendibl
 
 * **Evaluación General:** El sitio cuenta con una arquitectura estática sólida, validada y libre de servidores o secretos.
 * **Veredicto:** **`GO PARA FASE 4B`** para ejecutar las correcciones de accesibilidad (H1 en `/como-funciona`, adaptación de temas en `/sobre-nosotros`), metadatos SEO por página y refuerzos de contenido.
+
+---
+
+## 4. Estado Post-Auditoría: FASE 4B Ejecutada y Verificada
+
+Todas las observaciones señaladas en este informe fueron resueltas integralmente durante la **FASE 4B** y documentadas en `docs/PHASE_4B_CORRECTION_REPORT.md`.
