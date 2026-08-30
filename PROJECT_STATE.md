@@ -211,16 +211,26 @@ Config Entrypoints en raíz (4):
 - Suite ampliada a 16 tests automatizados (100% pasando).
 - Documentado en `docs/PHASE_4B_1_RESIDUAL_FIX_REPORT.md`.
 
+### FASE 5A — Auditoría de gobierno y preparación del plan del PR [✓ COMPLETADA — SOLO LECTURA]
+- Inspección de configuración del repositorio, estado del PR #1 y checks de CI.
+- Detección de rama `main` sin reglas de protección configuradas.
+- Elaboración de propuesta de protección adaptada a proyecto single-maintainer sin bloqueo operativo.
+- Comparativa técnica de estrategias de merge (Squash Merge vs Merge Commit vs Rebase).
+- Plan de release estático con tags semánticos y estrategia de rollback basada en redeploy de artefactos `out/`.
+- Documentado en `docs/PHASE_5A_GOVERNANCE_READINESS.md`.
+
 ---
 
 ## Próxima Tarea Pendiente
 
 La próxima unidad de trabajo es:
 
-**FASE 5A — Auditoría de gobierno y preparación del plan del PR**
+**FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge**
+
+*Nota: La ejecución de la FASE 5B permanece supeditada a autorización explícita de Julio. La FASE 6 (Despliegue y publicación en producción) permanece pendiente y sin desplegar.*
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5A — Auditoría de gobierno y preparación del plan del PR” en el repositorio julitodk06/lexiacode-website.
+Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge” en el repositorio julitodk06/lexiacode-website previa autorización explícita.
 ~~~
