@@ -29,8 +29,17 @@ jobs:
       - name: Run TypeScript validation
         run: npm run typecheck
 
+      - name: Run unit and integration tests
+        run: npm run test:run
+
       - name: Build and static export
         run: npm run build
+
+      - name: Run static export verification
+        run: npm run test:static
+
+      - name: Run reachability audit
+        run: npm run audit:reachability
 
       - name: Security audit check (high/critical)
         run: npm audit --audit-level=high

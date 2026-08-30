@@ -337,20 +337,33 @@ Cada fase debe ejecutarse sobre una rama específica, producir un commit revisab
 
 ---
 
-### FASE 3 — Cobertura automatizada mínima [⏳ EN CURSO / AUTORIZADA]
+### FASE 3 — Cobertura automatizada mínima [✓ COMPLETADA]
 
 **Objetivo:** detectar regresiones funcionales antes del merge.
+**Estado:** COMPLETADA y documentada en `docs/PHASE_3_TEST_REPORT.md`.
+**Entregables implementados:**
+1. **Tests unitarios e integración (`tests/`):**
+   - `tests/language-context.test.tsx` (4 tests: inicial, conmutación es/en/pt, persistencia en localStorage con clave `lexiacode-lang`, fallback seguro).
+   - `tests/chatbot-widget.test.tsx` (3 tests: render/toggle, dudas interactivas, ausencia de `fetch`/API keys/GEMINI, deslinde orientativo preliminar).
+   - `tests/contact-section.test.tsx` (3 tests: campos de formulario, email `juliov@lexiacode.com`, WhatsApp `+54 381 540 0016`, mailto estructurado sin backend).
+2. **Gate de export estático (`scripts/test-static-export.mjs`):**
+   - Verifica existencia de `out/`, 28 rutas estáticas, `sitemap.xml`, `robots.txt`, ancla `/#contact` y ausencia de `/api/chat`, `send-email.php`, `GEMINI_API_KEY`.
+3. **Scripts en `package.json`:** `test`, `test:run`, `test:static`.
+4. **CI Workflow (`.github/workflows/ci.yml`):** Integra `lint` -> `typecheck` -> `test:run` -> `build` -> `test:static` -> `audit:reachability` -> `audit`.
 
-1. Agregar pruebas unitarias del LanguageContext y del estado del chatbot.
-2. Agregar pruebas de componente para contacto y navegación.
-3. Agregar smoke tests de rutas, anchors y sitemap sobre el export estático.
-4. Integrar tests al workflow como check obligatorio.
+---
 
-**Aceptación:** tests deterministas, CI verde y fallos demostrables ante enlaces o claves de traducción rotas.
+### FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones [⏳ EN CURSO / AUTORIZADA]
 
-### FASE 4 — Auditoría de accesibilidad, SEO y contenido
+**Objetivo:** auditoría integral de lectura y análisis de la web estática exportada y su código fuente sin modificar lógica, texto ni estilos.
 
-**Objetivo:** asegurar consistencia pública y profesional.
+---
+
+## Primera tarea pendiente
+
+La próxima unidad de trabajo es exactamente:
+
+**FASE 4A — Auditoría de accesibilidad, SEO y contenido sin correcciones**
 
 1. Validar jerarquía de headings, nombres accesibles, contraste y teclado.
 2. Verificar canonical, Open Graph, sitemap, robots y datos estructurados.
