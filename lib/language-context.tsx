@@ -21,11 +21,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       setLanguageState(saved)
     } else {
       // Auto-detect browser language
-      const browserLang = navigator.language.slice(0, 2)
+      const browserLang = navigator.language?.slice(0, 2)
       if (browserLang === 'es') setLanguageState('es')
       else if (browserLang === 'pt') setLanguageState('pt')
+      else setLanguageState('en')
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.lang = language
+    }
+  }, [language])
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)

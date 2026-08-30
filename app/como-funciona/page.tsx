@@ -16,7 +16,7 @@ export default function ComoFuncionaPage() {
       <main className="relative min-h-screen bg-transparent">
         <Header />
         <div className="pt-24 lg:pt-32">
-          <HowItWorks />
+          <HowItWorks asPageHeading={true} />
         </div>
         <Footer />
       </main>

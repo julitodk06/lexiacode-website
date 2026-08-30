@@ -5,20 +5,49 @@ import { ChatbotWidget } from '@/components/ui/chatbot-widget'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from '@/components/theme-provider'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: '--font-inter'
 });
 
-const robotoMono = Roboto_Mono({ 
+const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   variable: '--font-roboto-mono'
 });
 
 export const metadata: Metadata = {
-  title: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
+  metadataBase: new URL('https://lexiacode.com'),
+  title: {
+    default: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
+    template: '%s | LexiaCode',
+  },
   description: 'Estudio de producto y tecnología especializado en arquitectura funcional, desarrollo de smart contracts en Solidity, microservicios y soluciones con IA.',
   generator: 'LexiaCode',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_AR',
+    url: 'https://lexiacode.com/',
+    siteName: 'LexiaCode',
+    title: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
+    description: 'Estudio de producto y tecnología especializado en arquitectura funcional, desarrollo de smart contracts en Solidity, microservicios y soluciones con IA.',
+    images: [
+      {
+        url: 'https://lexiacode.com/hero_custom_new.png',
+        width: 1672,
+        height: 941,
+        alt: 'LexiaCode - Estudio de Producto, Web3 e Inteligencia Artificial',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LexiaCode | Estudio de Producto, Web3 & Inteligencia Artificial',
+    description: 'Estudio de producto y tecnología especializado en arquitectura funcional, desarrollo de smart contracts en Solidity, microservicios y soluciones con IA.',
+    images: ['https://lexiacode.com/hero_custom_new.png'],
+  },
   keywords: ['tokenizacion en argentina', 'tokenizacion de activos argentina', 'tokenizar real estate argentina', 'RWA argentina', 'activos reales blockchain', 'smart contracts argentina', 'blockchain argentina'],
   icons: {
     icon: [

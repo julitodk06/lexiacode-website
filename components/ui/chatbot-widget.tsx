@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -55,7 +56,10 @@ const SUGGESTED_DUDAS = [
 
 export function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false)
-  
+  const pathname = usePathname()
+  const router = useRouter()
+  const openButtonRef = useRef<HTMLButtonElement>(null)
+
   // Estados para el diagnóstico técnico preliminar
   const [diagStep, setDiagStep] = useState<"none" | "asking-asset" | "asking-docs" | "asking-scope" | "asking-stage" | "result">("none")
   const [diagData, setDiagData] = useState<{ assetType?: string; docsState?: string; techScope?: string; devStage?: string }>({})
@@ -77,16 +81,63 @@ export function ChatbotWidget() {
   }
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages, isTyping])
+    if (isOpen) {
+      scrollToBottom()
+    }
+  }, [messages, isTyping, isOpen])
+
+  // Manejo de tecla Escape para accesibilidad
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false)
+        openButtonRef.current?.focus()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen])
+
+  // Navegación centralizada y prellenado transparente hacia #contact
+  const navigateToContact = (prefillText?: string, prefillCompany?: string) => {
+    setIsOpen(false)
+    const isHome = pathname === "/" || pathname === "" || pathname === null
+    if (isHome) {
+      const contactSection = document.getElementById("contact")
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: "smooth" })
+      }
+    } else {
+      router.push("/#contact")
+    }
+
+    if (prefillText || prefillCompany) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("lexia-contact-prefill", { detail: { company: prefillCompany, message: prefillText } }))
+      }
+
+      setTimeout(() => {
+        if (prefillCompany) {
+          const companyInput = document.querySelector('#contact-company') as HTMLInputElement
+          if (companyInput) {
+            companyInput.value = prefillCompany
+            companyInput.dispatchEvent(new Event('input', { bubbles: true }))
+          }
+        }
+        if (prefillText) {
+          const messageTextarea = document.querySelector('#contact-message') as HTMLTextAreaElement
+          if (messageTextarea) {
+            messageTextarea.value = prefillText
+            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }))
+          }
+        }
+      }, 100)
+    }
+  }
 
   // Redirección fluida al calendario de contacto
   const handleScheduleClick = () => {
-    setIsOpen(false)
-    const contactSection = document.getElementById("contact") || document.getElementById("contacto")
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" })
-    }
+    navigateToContact()
   }
 
   // Manejar el clic en una duda sugerida de la sesión de dudas
@@ -104,14 +155,14 @@ export function ChatbotWidget() {
     // Simular escritura de la IA para dar un efecto premium
     setTimeout(() => {
       setIsTyping(false)
-      
+
       let responseText = getBotResponse(queryKeyword)
-      
+
       if (queryKeyword === "viable") {
         setDiagStep("asking-asset")
         responseText = "Iniciemos un **diagnóstico técnico preliminar** (orientativo, no legal ni financiero).\n\n1. ¿Qué tipo de activo o proceso buscas modelar? (Ej: Inmobiliario, agropecuario, industrial o software SaaS)"
       }
-      
+
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: responseText,
@@ -140,11 +191,11 @@ export function ChatbotWidget() {
   // Función interna de respaldo estático determinista (robustecida e hiper-persuasiva)
   const getBotResponse = (query: string): string => {
     const q = query.toLowerCase()
-    
+
     if (q.includes("viable") || q.includes("puede tokenizarse") || q.includes("puedo tokenizar") || q.includes("mi activo")) {
       return "Para evaluar la viabilidad técnica de una iniciativa RWA, consideramos 3 criterios principales:\n\n1️⃣ **Definición Funcional**: Tener claridad sobre la estructura física o los derechos operativos que se buscan modelar.\n2️⃣ **Workflows de Smart Contracts**: Determinar si las reglas de acceso, permisos y eventos pueden automatizarse mediante Solidity de forma eficiente.\n3️⃣ **Marco Legal Coordinado**: Contar con asesoramiento legal especializado para definir el vehículo y el aislamiento patrimonial adecuado."
     }
-    
+
     if (q.includes("hola") || q.includes("buen") || q.includes("que tal") || q.includes("cómo estás") || q.includes("como estas")) {
       return "¡Hola! Qué gusto saludarte. Soy el asistente de LexiaCode. Somos un estudio de producto y tecnología especializado en arquitectura funcional Web3, smart contracts e inteligencia artificial.\n\n¿En qué te podemos ayudar hoy? Puedes consultarnos sobre viabilidad técnica de proyectos o escribirnos mediante el formulario de contacto."
     }
@@ -158,7 +209,7 @@ export function ChatbotWidget() {
     }
 
     if (q.includes("legal") || q.includes("regulacion") || q.includes("regulación") || q.includes("cnv") || q.includes("uif") || q.includes("ley") || q.includes("norma") || q.includes("normativa") || q.includes("ilegal") || q.includes("prohibir")) {
-      return "El desarrollo de contratos inteligentes debe realizarse con principios de compliance-by-design, considerando marcos regulatorios vigentes (como las normativas de la CNV en Argentina).\n\nEn LexiaCode nos encargamos de la arquitectura técnica y funcional, y coordinamos el análisis jurídico con abogados especializados para cada caso."
+      return "El desarrollo de contratos inteligentes debe realizarse con principios de compliance-by-design, considerando marcos regulatorios vigentes (como las normativas de la CNV en Argentina).\n\nEn LexiaCode brindamos orientación técnica y funcional preliminar, y coordinamos el análisis jurídico con abogados especializados para cada iniciativa. Nuestra orientación es de carácter técnico y preliminar y no sustituye asesoramiento legal, financiero o de inversión."
     }
 
     if (q.includes("costo") || q.includes("precio") || q.includes("cuánto") || q.includes("valora") || q.includes("presupuesto") || q.includes("caro") || q.includes("presupuestar") || q.includes("cuanto")) {
@@ -176,23 +227,23 @@ export function ChatbotWidget() {
     if (q.includes("tokeni") || q.includes("activo") || q.includes("rwa")) {
       return "La tokenización de activos del mundo real (RWA) consiste en modelar la representación digital de activos o iniciativas mediante contratos inteligentes.\n\nEn LexiaCode diseñamos la arquitectura funcional, los flujos de smart contracts y las integraciones necesarias para evaluar y desarrollar proyectos por etapas."
     }
-    
+
     if (q.includes("web3") || q.includes("blockchain") || q.includes("smart contract") || q.includes("contrato") || q.includes("tecnolog") || q.includes("ethereum") || q.includes("polygon")) {
       return "Trabajamos con redes compatibles con EVM (Ethereum, Polygon), diseñando smart contracts en Solidity y suites de pruebas para asegurar que la lógica cumpla con las especificaciones del producto."
     }
-    
+
     if (q.includes("inmobil") || q.includes("real estate") || q.includes("propiedad") || q.includes("casa") || q.includes("edificio") || q.includes("terren")) {
       return "En Real Estate evaluamos el modelado funcional para digitalización de participaciones y automatización de flujos operativos entre partes interesadas."
     }
-    
+
     if (q.includes("agro") || q.includes("cosecha") || q.includes("campo") || q.includes("cultivo") || q.includes("trigo") || q.includes("tierra")) {
       return "En el sector agropecuario diseñamos arquitectura de software y trazabilidad on-chain para seguimiento de etapas productivas y acuerdos comerciales."
     }
-    
+
     if (q.includes("reunion") || q.includes("agendar") || q.includes("llamada") || q.includes("contacto") || q.includes("turno") || q.includes("conversar") || q.includes("reunión")) {
       return "¡Excelente! Puedes escribirnos directamente a través de la sección de contacto en la web o enviarnos un mensaje por WhatsApp para coordinar una reunión de evaluación técnica."
     }
-    
+
     return "En LexiaCode somos un estudio de producto y tecnología especializado en arquitectura Web3, smart contracts en Solidity y agentes de IA aplicados. Ayudamos a evaluar la viabilidad técnica de iniciativas y desarrollar soluciones por etapas. ¿Sobre qué tema te gustaría consultar?"
   }
 
@@ -277,65 +328,31 @@ export function ChatbotWidget() {
       return
     }
 
-    try {
-      // Consultar API backend con el mensaje e historial de conversación para darle memoria contextual
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: userQuery,
-          history: messages.slice(-5) // Envía los últimos 5 mensajes
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error("Falla en la API")
-      }
-
-      const data = await response.json()
-      setIsTyping(false)
-
-      if (data.fallback) {
-        // Si el servidor activa el fallback
-        const botResponse: Message = {
-          id: Date.now().toString(),
-          text: getBotResponse(userQuery),
-          sender: "bot",
-          timestamp: new Date()
-        }
-        setMessages((prev) => [...prev, botResponse])
-      } else {
-        // Respuesta exitosa del motor conversacional de Gemini IA
-        const botResponse: Message = {
-          id: Date.now().toString(),
-          text: data.text,
-          sender: "bot",
-          timestamp: new Date()
-        }
-        setMessages((prev) => [...prev, botResponse])
-      }
-    } catch (error) {
-      console.error("Fallo al conectar con el servidor de IA, activando motor determinista:", error)
+    // Respuesta estática y determinista local sin requerimiento de red ni backend
+    setTimeout(() => {
       setIsTyping(false)
       const botResponse: Message = {
-        id: Date.now().toString(),
+        id: (Date.now() + 1).toString(),
         text: getBotResponse(userQuery),
         sender: "bot",
         timestamp: new Date()
       }
       setMessages((prev) => [...prev, botResponse])
-    }
+    }, 450)
   }
 
   return (
     <>
       {/* Botón flotante */}
       <button
+        ref={openButtonRef}
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-all duration-300 hover:scale-110 focus:outline-none ${isOpen ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}
-        aria-label="Abrir chat"
+        aria-label="Abrir asistente técnico"
+        aria-expanded={isOpen}
+        aria-controls="chatbot-dialog"
+        tabIndex={isOpen ? -1 : 0}
+        aria-hidden={isOpen}
+        className={`fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl transition-all duration-300 hover:scale-110 focus:outline-none ${isOpen ? "scale-0 opacity-0 pointer-events-none" : "scale-100 opacity-100"}`}
       >
         <MessageSquare className="h-6 w-6" />
         <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -345,10 +362,14 @@ export function ChatbotWidget() {
       </button>
 
       {/* Ventana de chat */}
-      <div 
-        className={`fixed bottom-6 right-6 z-50 w-[350px] sm:w-[380px] transition-all duration-300 origin-bottom-right ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}`}
-      >
-        <Card className="flex h-[530px] flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-xl">
+      {isOpen && (
+        <div
+          id="chatbot-dialog"
+          role="dialog"
+          aria-labelledby="chatbot-title"
+          className="fixed bottom-6 right-6 z-50 w-[350px] sm:w-[380px] transition-all duration-300 origin-bottom-right scale-100 opacity-100"
+        >
+          <Card className="flex h-[530px] flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-xl">
           {/* Header */}
           <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 bg-muted/30 px-4 py-3 space-y-0">
             <div className="flex items-center gap-3">
@@ -356,7 +377,7 @@ export function ChatbotWidget() {
                 <Bot className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground text-sm">LexiaBot</h3>
+                <h3 id="chatbot-title" className="font-semibold text-foreground text-sm">LexiaBot</h3>
                 <p className="text-[10px] text-emerald-400 flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
                   En línea
@@ -373,7 +394,16 @@ export function ChatbotWidget() {
               >
                 <RefreshCw className="h-3 w-3" /> Asistente de Tokenización
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8 rounded-full hover:bg-background/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Cerrar asistente"
+                onClick={() => {
+                  setIsOpen(false)
+                  openButtonRef.current?.focus()
+                }}
+                className="h-8 w-8 rounded-full hover:bg-background/50"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -383,14 +413,14 @@ export function ChatbotWidget() {
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                <div 
+                <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line leading-relaxed ${msg.sender === "user" ? "bg-primary text-primary-foreground rounded-br-none" : "bg-muted text-foreground border border-border/40 rounded-bl-none"}`}
                 >
                   {msg.text}
                 </div>
               </div>
             ))}
-            
+
             {/* Indicador de escritura */}
             {isTyping && (
               <div className="flex justify-start animate-pulse">
@@ -425,69 +455,39 @@ export function ChatbotWidget() {
                 </div>
               </div>
             )}
-            
+
             {/* Botón rápido de contacto / reunión sugerido después de que el usuario interactúa */}
             {messages.length > 1 && !isTyping && (
               <div className="flex flex-col gap-2 mt-2 animate-fadeIn">
                 {diagStep === "result" ? (
-                  <Button 
+                  <Button
                     onClick={() => {
-                      setIsOpen(false)
-                      const contactSection = document.getElementById("contact") || document.getElementById("contacto")
-                      if (contactSection) {
-                        contactSection.scrollIntoView({ behavior: "smooth" })
-                        
-                        // Rellenar automáticamente el formulario de contacto con los datos del diagnóstico técnico
-                        setTimeout(() => {
-                          const messageTextarea = document.querySelector('textarea[placeholder*="Tell us about your project"], textarea[placeholder*="mensaje"]') as HTMLTextAreaElement;
-                          const companyInput = document.querySelector('input[placeholder*="Acme Corp"], input[placeholder*="Empresa"]') as HTMLInputElement;
-                          
-                          if (companyInput) {
-                            companyInput.value = "Iniciativa Técnica Web3 / RWA";
-                            companyInput.dispatchEvent(new Event('input', { bubbles: true }));
-                          }
-                          
-                          if (messageTextarea) {
-                            messageTextarea.value = `Hola, completé el diagnóstico técnico preliminar en el chat. Iniciativa: ${diagData.assetType || "No especificado"}, Estado documental: ${diagData.docsState || "En proceso"}, Alcance técnico: ${diagData.techScope || "Smart contracts"}, Etapa: ${diagData.devStage || "En evaluación"}. Me gustaría coordinar una sesión de evaluación técnica.`;
-                            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-                          }
-                        }, 500);
-                      }
+                      const msg = `Hola, completé el diagnóstico técnico preliminar en el chat. Iniciativa: ${diagData.assetType || "No especificado"}, Estado documental: ${diagData.docsState || "En proceso"}, Alcance técnico: ${diagData.techScope || "Smart contracts"}, Etapa: ${diagData.devStage || "En evaluación"}. Me gustaría coordinar una sesión de evaluación técnica.`
+                      navigateToContact(msg, "Iniciativa Técnica Web3 / RWA")
                     }}
-                    size="sm" 
+                    size="sm"
                     className="w-full bg-primary hover:bg-[#e87722] text-white gap-2 rounded-xl text-xs font-bold font-mono uppercase tracking-wider cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98] transition-transform py-3"
                   >
                     Coordinar Evaluación Técnica
                   </Button>
                 ) : messages.filter(m => m.sender === 'user').length >= 2 ? (
                   // Si el usuario ha enviado al menos 2 mensajes en general, mostrar también el CTA de evaluación/diagnóstico
-                  <Button 
+                  <Button
                     onClick={() => {
-                      setIsOpen(false)
-                      const contactSection = document.getElementById("contact") || document.getElementById("contacto")
-                      if (contactSection) {
-                        contactSection.scrollIntoView({ behavior: "smooth" })
-                        
-                        setTimeout(() => {
-                          const messageTextarea = document.querySelector('textarea[placeholder*="Tell us about your project"], textarea[placeholder*="mensaje"]') as HTMLTextAreaElement;
-                          if (messageTextarea) {
-                            messageTextarea.value = "Hola, me gustaría solicitar una sesión de evaluación técnica preliminar para un proyecto de software / smart contracts.";
-                            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-                          }
-                        }, 500);
-                      }
+                      const msg = "Hola, me gustaría solicitar una sesión de evaluación técnica preliminar para un proyecto de software / smart contracts."
+                      navigateToContact(msg)
                     }}
-                    size="sm" 
+                    size="sm"
                     className="w-full bg-primary hover:bg-[#e87722] text-white gap-2 rounded-xl text-xs font-bold font-mono uppercase tracking-wider cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98] transition-transform py-3"
                   >
                     Solicitar Evaluación Técnica
                   </Button>
                 ) : null}
-                
-                <Button 
+
+                <Button
                   onClick={handleScheduleClick}
-                  variant="outline" 
-                  size="sm" 
+                  variant="outline"
+                  size="sm"
                   className="bg-background/60 border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/60 gap-2 rounded-xl text-[11px] font-semibold cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform"
                 >
                   <Calendar className="h-3 w-3" /> Agendar Consulta Técnica
@@ -503,16 +503,24 @@ export function ChatbotWidget() {
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
+                aria-label="Mensaje para el asistente"
                 placeholder="Describe tu activo o consulta sobre tokenización..."
                 className="flex-1 rounded-full bg-background/50 border-border/50 text-sm h-10 focus-visible:ring-primary/50"
               />
-              <Button type="submit" size="icon" disabled={!inputValue.trim() || isTyping} className="h-10 w-10 rounded-full shrink-0 shadow-lg cursor-pointer">
+              <Button
+                type="submit"
+                size="icon"
+                aria-label="Enviar mensaje"
+                disabled={!inputValue.trim() || isTyping}
+                className="h-10 w-10 rounded-full shrink-0 shadow-lg cursor-pointer"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </form>
           </CardFooter>
         </Card>
       </div>
+      )}
     </>
   )
 }

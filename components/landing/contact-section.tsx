@@ -4,22 +4,30 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Send, CheckCircle2, Mail, Building2, Calendar, Video, Clock, ArrowRight } from "lucide-react"
+import { Mail, Building2 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
-import { useTheme } from "next-themes"
+import { buildMailtoUrl, buildWhatsAppUrl, OFFICIAL_CONTACT } from "@/lib/contact-links"
 
 export function ContactSection() {
   const { t, language } = useLanguage()
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const [activeTab, setActiveTab] = useState<"message" | "meeting">("message")
   const [formData, setFormData] = useState({ name: "", email: "", company: "", message: "" })
   const [selectedAsset, setSelectedAsset] = useState("")
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [openedClient, setOpenedClient] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const handlePrefill = (e: Event) => {
+      const customEvent = e as CustomEvent<{ company?: string; message?: string }>
+      if (customEvent.detail) {
+        setFormData((prev) => ({
+          ...prev,
+          company: customEvent.detail.company ?? prev.company,
+          message: customEvent.detail.message ?? prev.message,
+        }))
+      }
+    }
+
+    window.addEventListener("lexia-contact-prefill", handlePrefill)
+    return () => window.removeEventListener("lexia-contact-prefill", handlePrefill)
   }, [])
 
   const assetTypes = {
@@ -48,84 +56,30 @@ export function ContactSection() {
 
   const currentAssetsList = assetTypes[language] || assetTypes.es
 
-  // Configuración de textos locales para multi-idioma (ES, EN, PT)
-  const tabTranslations = {
-    en: {
-      tabMessage: "Send Message",
-      tabMeeting: "Schedule Call",
-      meetTitle: "Agendá tu Demo (Google Meet)",
-      meetSubtitle: "Book a 15-minute discovery call directly with our engineering and legal team to analyze your project.",
-      meetBtn: "Schedule Meeting via Google Meet",
-      meetInfo: "A Google Meet calendar invite will be automatically generated and sent to your email.",
-      interestLabel: "Type of Asset:",
-      benefits: [
-        "15-Minute Technical Discovery",
-        "Direct Google Meet Auto-Invite",
-        "Instant Email Confirmation"
-      ]
-    },
-    es: {
-      tabMessage: "Enviar Mensaje",
-      tabMeeting: "Agendar Reunión",
-      meetTitle: "Agendá tu Demo (Google Meet)",
-      meetSubtitle: "Reserva una sesión estratégica de 15 minutos directamente con nuestro equipo técnico y legal para analizar tu proyecto.",
-      meetBtn: "Agendar Reunión vía Google Meet",
-      meetInfo: "Se generará automáticamente un enlace de Google Meet y se enviará una invitación de calendario a tu correo.",
-      interestLabel: "Tipo de activo:",
-      benefits: [
-        "Sesión técnica y estratégica de 15 min",
-        "Invitación automática con Google Meet",
-        "Confirmación y recordatorio por email"
-      ]
-    },
-    pt: {
-      tabMessage: "Enviar Mensagem",
-      tabMeeting: "Agendar Reunião",
-      meetTitle: "Agendar sua Demo (Google Meet)",
-      meetSubtitle: "Reserve uma sessão estratégica de 15 minutos diretamente com nossa equipe técnica e jurídica para analisar seu projeto.",
-      meetBtn: "Agendar Reunião via Google Meet",
-      meetInfo: "Um link do Google Meet será gerado automaticamente e um convite de calendário será enviado para seu e-mail.",
-      interestLabel: "Tipo de ativo:",
-      benefits: [
-        "Sessão técnica e estratégica de 15 min",
-        "Convite automático com Google Meet",
-        "Confirmação e lembrete por e-mail"
-      ]
-    }
+  const handleSendEmail = (e: React.FormEvent) => {
+    e.preventDefault()
+    const assetLabel = selectedAsset ? (currentAssetsList.find((opt) => opt.key === selectedAsset)?.label || selectedAsset) : "No especificado"
+    const mailtoUrl = buildMailtoUrl({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      assetType: assetLabel,
+      message: formData.message,
+    })
+    window.location.href = mailtoUrl
+    setOpenedClient(true)
   }
 
-  const currentTabT = tabTranslations[language] || tabTranslations.es
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
-    try {
-      const response = await fetch('/send-email.php', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          Nombre: formData.name,
-          Email: formData.email,
-          Empresa: formData.company,
-          Activo: selectedAsset ? (currentAssetsList.find((opt) => opt.key === selectedAsset)?.label || selectedAsset) : "No especificado",
-          Mensaje: formData.message
-        })
-      })
-
-      if (response.ok) {
-        setSubmitted(true)
-      } else {
-        setSubmitted(true)
-      }
-    } catch (err) {
-      setSubmitted(true)
-    } finally {
-      setLoading(false)
-    }
+  const handleWhatsApp = () => {
+    const assetLabel = selectedAsset ? (currentAssetsList.find((opt) => opt.key === selectedAsset)?.label || selectedAsset) : "No especificado"
+    const waUrl = buildWhatsAppUrl({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      assetType: assetLabel,
+      message: formData.message,
+    })
+    window.open(waUrl, "_blank")
   }
 
   return (
@@ -154,32 +108,32 @@ export function ContactSection() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 bg-secondary/50">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                <span>juliov@lexiacode.com</span>
+                <span>{OFFICIAL_CONTACT.email}</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366]">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" /><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" /></svg>
                 </div>
-                <a href="https://wa.me/5493815400016" target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">
-                  +54 381 540 0016
+                <a href={OFFICIAL_CONTACT.whatsAppBaseUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">
+                  {OFFICIAL_CONTACT.phone}
                 </a>
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 bg-secondary/50">
                   <Building2 className="h-4 w-4 text-primary" />
                 </div>
-                <span>Consultas corporativas recibidas · Respuesta en 24h</span>
+                <span>Atención técnica directa por Julio Antonio Villalobo</span>
               </div>
             </div>
 
             {/* What to expect */}
             <div className="mt-10 rounded-xl border border-border/30 bg-secondary/20 p-5 backdrop-blur-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">¿Qué sucede después?</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Metodología de contacto</p>
               <div className="space-y-2.5">
                 {[
-                  "Revisamos tu consulta en menos de 24 horas",
-                  "Agendamos una llamada de diagnóstico con nuestro equipo",
-                  "Recibes una propuesta técnica o informe preliminar de alcance",
+                  "Recepción directa de requerimientos técnicos en bandeja de entrada",
+                  "Coordinación de llamada de evaluación técnica y alcance",
+                  "Elaboración de propuesta preliminar de desarrollo e hitos",
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[9px] font-bold text-primary mt-0.5">
@@ -194,113 +148,113 @@ export function ContactSection() {
 
           {/* Right — Contact Form */}
           <div className="rounded-2xl border border-border/40 bg-card/30 p-8 backdrop-blur-sm shadow-xl shadow-black/10 flex flex-col gap-6">
-
-            {/* TAB 1: MESSAGE FORM */}
-            {activeTab === "message" && (
-              submitted ? (
-                <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 bg-accent/10">
-                    <CheckCircle2 className="h-8 w-8 text-accent" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground">{t.contact.successTitle}</h3>
-                  <p className="text-muted-foreground">{t.contact.successMessage}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { setSubmitted(false); setFormData({ name: "", email: "", company: "", message: "" }); setSelectedAsset("") }}
-                    className="mt-2 border-border/50"
-                  >
-                    Enviar otro mensaje
-                  </Button>
+            <form onSubmit={handleSendEmail} className="space-y-5">
+              <fieldset className="border-0 p-0 m-0">
+                <legend className="mb-3 text-sm font-medium text-foreground">
+                  {language === "en" ? "Type of Asset / Scope:" : language === "pt" ? "Tipo de Ativo / Escopo:" : "Tipo de activo o proceso:"}
+                </legend>
+                <div className="flex flex-wrap gap-2">
+                  {currentAssetsList.map((opt) => (
+                    <button
+                      type="button"
+                      key={opt.key}
+                      aria-pressed={selectedAsset === opt.key}
+                      onClick={() => setSelectedAsset(opt.key)}
+                      className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-all ${
+                        selectedAsset === opt.key
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/40 bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <p className="mb-3 text-sm font-medium text-foreground">{currentTabT.interestLabel}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {currentAssetsList.map((opt) => (
-                        <button
-                          type="button"
-                          key={opt.key}
-                          onClick={() => setSelectedAsset(opt.key)}
-                          className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-all ${
-                            selectedAsset === opt.key
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border/40 bg-secondary/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              </fieldset>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-muted-foreground">{t.contact.namePlaceholder}</label>
-                      <Input
-                        required
-                        placeholder="Ej. Carlos Mendoza"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-muted-foreground">{t.contact.emailPlaceholder}</label>
-                      <Input
-                        required
-                        type="email"
-                        placeholder="ejemplo@empresa.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
-                      />
-                    </div>
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label htmlFor="contact-name" className="text-xs font-medium text-muted-foreground">{t.contact.namePlaceholder}</label>
+                  <Input
+                    id="contact-name"
+                    required
+                    placeholder="Ej. Carlos Mendoza"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="contact-email" className="text-xs font-medium text-muted-foreground">{t.contact.emailPlaceholder}</label>
+                  <Input
+                    id="contact-email"
+                    required
+                    type="email"
+                    placeholder="ejemplo@empresa.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
+                  />
+                </div>
+              </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">{t.contact.companyPlaceholder}</label>
-                    <Input
-                      placeholder="Ej. LexiaTech / Tokenización de Inmuebles"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
-                    />
-                  </div>
+              <div className="space-y-1.5">
+                <label htmlFor="contact-company" className="text-xs font-medium text-muted-foreground">{t.contact.companyPlaceholder}</label>
+                <Input
+                  id="contact-company"
+                  placeholder="Ej. Nombre de empresa / Iniciativa"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50"
+                />
+              </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">{t.contact.messagePlaceholder}</label>
-                    <Textarea
-                      required
-                      placeholder="Describe brevemente tu objetivo, proyecto o consulta técnica..."
-                      rows={5}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 resize-none"
-                    />
-                  </div>
+              <div className="space-y-1.5">
+                <label htmlFor="contact-message" className="text-xs font-medium text-muted-foreground">{t.contact.messagePlaceholder}</label>
+                <Textarea
+                  id="contact-message"
+                  required
+                  placeholder="Describe brevemente tu objetivo, iniciativa o requerimiento técnico..."
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="border-border/40 bg-background/50 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 resize-none"
+                />
+              </div>
 
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 disabled:opacity-60 transition-all hover:shadow-primary/40"
-                  >
-                    {loading ? "Sending..." : t.contact.submit}
-                    <Send className="ml-2 h-4 w-4" />
-                  </Button>
+              <div className="grid gap-3 sm:grid-cols-2 pt-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 cursor-pointer text-xs uppercase tracking-wider font-semibold"
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  {language === "en" ? "Send via Email" : language === "pt" ? "Enviar por Email" : "Enviar por Email"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleWhatsApp}
+                  variant="outline"
+                  className="w-full border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366]/10 shadow-sm transition-all cursor-pointer text-xs uppercase tracking-wider font-semibold"
+                >
+                  <svg className="mr-2 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z" /></svg>
+                  {language === "en" ? "Open WhatsApp" : language === "pt" ? "Abrir WhatsApp" : "Contactar por WhatsApp"}
+                </Button>
+              </div>
 
-                  <p className="text-center text-xs text-muted-foreground/60">
-                    Al enviar este formulario, aceptas nuestra Política de Privacidad y Términos de Servicio.
-                  </p>
-                </form>
-              )
-            )}
+              {openedClient && (
+                <div className="p-3.5 rounded-xl border border-primary/30 bg-primary/5 text-xs text-muted-foreground leading-relaxed animate-fadeIn">
+                  <p className="font-semibold text-primary mb-1">Información de envío:</p>
+                  Se abrió tu aplicación de correo para completar el envío a <strong className="text-foreground">{OFFICIAL_CONTACT.email}</strong> con los datos cargados. Si no se abrió automáticamente, puedes escribirnos directamente a esa dirección o contactarnos vía WhatsApp.
+                </div>
+              )}
 
+              <p className="text-center text-xs text-muted-foreground/60">
+                Al contactar a LexiaCode, aceptas nuestra Política de Privacidad y Términos de Servicio.
+              </p>
+            </form>
           </div>
         </div>
       </div>
     </section>
   )
 }
-

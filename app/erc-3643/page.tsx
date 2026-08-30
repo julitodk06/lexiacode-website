@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { LanguageProvider } from '@/lib/language-context'
@@ -116,12 +117,12 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   Desarrollamos contratos inteligentes en Solidity tomando como referencia el estándar ERC-3643, adaptando la lógica de permisos y registros de identidad a los requerimientos de cada iniciativa.
                 </p>
-                <a
-                  href="/#contacto"
+                <Link
+                  href="/#contact"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Servicios de Desarrollo <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
 
             </article>

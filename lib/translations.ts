@@ -108,7 +108,7 @@ export const translations = {
       description: 'Preliminary technical due diligence and smart contract workflow evaluation for a mining initiative. Advised against proceeding after identifying legal and counterparty risks.',
       metrics: {
         asset: 'Asset Scope',
-        assetValue: 'Mining Rights Evaluation',
+        assetValue: 'Mining Rights (~USD 100M Ref)',
         target: 'Scope',
         extension: 'Technical Assessment',
       },
@@ -157,7 +157,7 @@ export const translations = {
       messagePlaceholder: 'Tell us about your project or technical inquiry...',
       submit: 'Send Inquiry',
       successTitle: 'Inquiry Received!',
-      successMessage: 'We will get back to you within 24 hours.',
+      successMessage: 'We will get in touch with you shortly.',
       options: {
         label: 'I am interested in:',
         rwa: 'RWA Product Architecture',
@@ -315,7 +315,7 @@ export const translations = {
       description: 'Evaluación preliminar de una iniciativa RWA vinculada a un activo minero. El trabajo incluyó análisis de arquitectura, estructuración preliminar y due diligence. Se recomendó no avanzar después de identificar riesgos legales y de contraparte.',
       metrics: {
         asset: 'Tipo de Activo',
-        assetValue: 'Derechos Mineros (Evaluación)',
+        assetValue: 'Derechos Mineros (~USD 100M Ref)',
         target: 'Alcance',
         extension: 'Evaluación Técnica',
       },
@@ -364,7 +364,7 @@ export const translations = {
       messagePlaceholder: 'Cuéntanos sobre tu iniciativa o consulta técnica...',
       submit: 'Enviar Consulta',
       successTitle: '¡Consulta Recibida!',
-      successMessage: 'Nos pondremos en contacto en menos de 24 horas.',
+      successMessage: 'Nos pondremos en contacto a la brevedad.',
       options: {
         label: 'Me interesa:',
         rwa: 'Arquitectura de Producto RWA',
@@ -522,7 +522,7 @@ export const translations = {
       description: 'Avaliação preliminar de uma iniciativa RWA vinculada a um ativo de mineração. O trabalho incluiu análise de arquitetura, estruturação preliminar e due diligence. Recomendou-se não avançar após identificar riscos legais e de contraparte.',
       metrics: {
         asset: 'Tipo de Ativo',
-        assetValue: 'Direitos Minerários (Avaliação)',
+        assetValue: 'Direitos Minerários (~USD 100M Ref)',
         target: 'Escopo',
         extension: 'Avaliação Técnica',
       },
@@ -571,7 +571,7 @@ export const translations = {
       messagePlaceholder: 'Conte-nos sobre sua iniciativa ou consulta técnica...',
       submit: 'Enviar Consulta',
       successTitle: 'Consulta Recebida!',
-      successMessage: 'Retornaremos em até 24 horas.',
+      successMessage: 'Entraremos em contato em breve.',
       options: {
         label: 'Tenho interesse em:',
         rwa: 'Arquitetura de Produto RWA',
@@ -621,6 +621,6 @@ export const translations = {
       },
     },
   },
-} as const
+}
 
-export type Translations = typeof translations.en
+export type Translations = typeof translations.en | typeof translations.es | typeof translations.pt

@@ -25,12 +25,12 @@ LexiaCode operates strictly as a product and software engineering studio. We ass
 
 ## 🛠️ Technology Stack
 
-- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) — Configured for static HTML export (output: 'export')
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [PostCSS](https://postcss.org/)
 - **UI Components**: [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/), [Sonner](https://sonner.emilkowal.ski/)
 - **Internationalization**: Lightweight client context supporting Spanish, English, and Portuguese (lib/language-context.tsx).
-- **AI Engine Integration**: Google Gemini API integration with deterministic fallback for resilient conversational assistance.
+- **Interactive Assistant**: Local, deterministic technical assistant running entirely client-side without external backend or API dependencies.
 
 ---
 
@@ -39,62 +39,58 @@ LexiaCode operates strictly as a product and software engineering studio. We ass
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 20.x
-- 
-pm >= 10.x
+- [npm](https://www.npmjs.com/) >= 10.x
 
 ### Installation
 
-Clone the repository and install dependencies using clean install:
+Clone the repository and install dependencies using a clean install:
 
-\\\ash
+```bash
 git clone https://github.com/julitodk06/lexiacode-website.git
 cd lexiacode-website
 npm ci
-\\\
+```
 
-### Environment Variables
+### Verification & Quality Checks
 
-Copy .env.example to .env.local (optional for local AI features):
+Run the verification scripts locally:
 
-\\\ash
-cp .env.example .env.local
-\\\
+```bash
+# Run ESLint validation
+npm run lint
 
-| Variable | Description | Required | Default |
-|---|---|---|---|
-| GEMINI_API_KEY | Google Gemini API key for dynamic AI assistant responses. | Optional | Deterministic fallback system active |
+# Run TypeScript type check
+npm run typecheck
 
-> **Note**: The build process and static routes compile completely without requiring any API keys.
+# Run security audit
+npm audit --audit-level=high
+```
 
 ### Development Server
 
-Start the development server:
+Start the local development server:
 
-\\\ash
+```bash
 npm run dev
-\\\
+```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Production Build
+### Production Build & Static Export
 
-Create an optimized production build:
+Create an optimized static build:
 
-\\\ash
+```bash
 npm run build
-\\\
+```
 
-Start the production server:
-
-\\\ash
-npm start
-\\\
+This generates a fully static production export in the `out/` directory. The contents of `out/` can be directly hosted on any static hosting platform (e.g., GitHub Pages, Cloudflare Pages, AWS S3/CloudFront, Hostinger, Vercel, or Nginx/Apache web servers).
 
 ---
 
 ## 🔒 Legal & Regulatory Disclaimer
 
-LexiaCode is a software engineering and product technology studio. It is **not** a law firm, a regulated financial institution, an asset custodian, or an investment adviser. Nothing on this website or repository constitutes legal, financial, tax, or investment advice, nor an offer of securities. All legal encasement and regulatory compliance must be conducted by independent qualified legal counsel for each respective jurisdiction.
+LexiaCode is a software engineering and product technology studio. It is **not** a law firm, a regulated financial institution, an asset custodian, or an investment adviser. Nothing on this website or repository constitutes legal, financial, tax, or investment advice, nor an offer of securities. All legal structuring and regulatory assessment must be performed by qualified independent professionals for each respective jurisdiction.
 
 ---
 

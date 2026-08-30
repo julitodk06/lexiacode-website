@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { LanguageProvider } from '@/lib/language-context'
@@ -112,13 +113,13 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   Diseñamos especificaciones técnicas, desarrollamos smart contracts en Solidity con suites de testing automatizadas y coordinamos los requerimientos funcionales con especialistas legales y de auditoría independientes.
                 </p>
-                <a
-                  href="/#contacto"
+                <Link
+                  href="/#contact"
                   className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
                   Consultar sobre Servicios Técnicos
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
 
             </article>
