@@ -4,10 +4,12 @@
 >
 > Última revisión arquitectónica: 2026-08-30 (UTC)
 > Repositorio: https://github.com/julitodk06/lexiacode-website
-> Rama activa: **fix/public-repo-hardening**
-> Baseline funcional verificado: **203ca79116e09fb8533cf1970b92db20005a76ae**
-> Pull request: [Draft PR #1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)
-> Base de comparación: **main** en **9a3210d7881be3d604fe7d48cb94d48029ca7c07**
+> Rama estable actual: **main**
+> SHA estable verificado: **4559efde8eb5d6262c88863a9fe2df88936b7685**
+> Tag de Release: [v1.0.0-hardened](https://github.com/julitodk06/lexiacode-website/releases/tag/v1.0.0-hardened)
+> Pull request: [Merged PR #1 — fix: harden LexiaCode public website and static release pipeline](https://github.com/julitodk06/lexiacode-website/pull/1)
+> Estado de CI en main: **SUCCESS** (Workflow `CI` en Node 20 LTS)
+> Estado de Producción: **NO DESPLEGADA** (Hostinger y DNS intactos; FASE 6 pendiente)
 
 ## Estado Actual
 
@@ -15,7 +17,7 @@
 
 Este repositorio contiene exclusivamente el sitio público y portfolio profesional de **LexiaCode**. No contiene ni debe confundirse con un CRM, un backend de LexiaCode OS, una plataforma transaccional de tokenización, un bot de arbitraje, una custodia de activos ni un portal operativo de inversores.
 
-La rama activa está en proceso de endurecimiento previo a merge. El PR permanece en borrador y no existe autorización para fusionarlo ni desplegarlo.
+El Pull Request #1 fue integrado en `main` mediante **Squash Merge** generando el SHA `4559efde8eb5d6262c88863a9fe2df88936b7685`, y etiquetado con el tag semántico y GitHub Release `v1.0.0-hardened`. La rama `main` cuenta con reglas de protección activadas (status check obligatorio `build-and-test`, rama actualizada, resolución de conversaciones, bloqueo de force push y eliminación).
 
 ### Stack y arquitectura base
 
@@ -219,12 +221,19 @@ Config Entrypoints en raíz (4):
 - Plan de release estático con tags semánticos y estrategia de rollback basada en redeploy de artefactos `out/`.
 - Documentado en `docs/PHASE_5A_GOVERNANCE_READINESS.md`.
 
-### FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge [✓ COMPLETADA]
+### FASE 5B — Preparación de Release Candidate y Transición de PR [✓ COMPLETADA]
 - Validación integral de Release Candidate con todos los gates de calidad (16 tests, SSG build, reachability audit, security audit).
 - Estrategia de integración autorizada: **Squash Merge**.
 - Retiro del estado Draft del PR #1 a **Ready for Review**.
 - Elaboración del informe de preparación de release `docs/PHASE_5B_RELEASE_READINESS.md`.
 - Definición del plan de despliegue a producción `docs/PHASE_6_PRODUCTION_RELEASE_PLAN.md`.
+
+### FASE 5C — Cierre Post-Merge y Normalización de Gobernanza [✓ COMPLETADA]
+- Fusión de PR #1 en `main` mediante Squash Merge (SHA: `4559efde8eb5d6262c88863a9fe2df88936b7685`).
+- Tag semántico y GitHub Release `v1.0.0-hardened` creados y vinculados.
+- Branch protection configurada en GitHub para `main` (check obligatorio `build-and-test`, rama actualizada, resolución de conversaciones, bloqueo de force push y eliminación).
+- Validación de build limpio y 16 tests pasando en `main` (CI Run: `33327706643` en verde).
+- Documentado en `docs/PHASE_5C_POST_MERGE_CLOSEOUT.md`.
 
 ---
 
@@ -234,7 +243,7 @@ La próxima unidad de trabajo es:
 
 **FASE 6 — Despliegue y publicación en producción**
 
-*Nota: La ejecución de la FASE 6 (Merge a main, tag/release, despliegue a Hostinger y smoke tests post-deploy) permanece supeditada a autorización explícita de Julio. La infraestructura de producción permanece intacta.*
+*Nota: La ejecución de la FASE 6 (Despliegue de artefactos estáticos de `out/` a Hostinger y smoke tests post-deploy) permanece supeditada a autorización explícita de Julio. La infraestructura de producción permanece intacta.*
 
 ## Prompt exacto para iniciar la primera tarea
 

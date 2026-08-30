@@ -10,13 +10,11 @@
 
 ## 1. Identificación del Release Candidate
 
-- **Rama Origen:** `fix/public-repo-hardening`
-- **PR:** [#1 — fix: harden public portfolio and static export](https://github.com/julitodk06/lexiacode-website/pull/1)
-- **Base Destino:** `main`
-- **Estrategia de Integración:** **Squash Merge**
-- **Tag Semántico Propuesto:** `v1.0.0-hardened`
-- **Título de Commit Consolidado:**
-  `fix: harden LexiaCode public website and static release pipeline (#1)`
+- **Rama Estable de Release:** `main`
+- **SHA de Release:** `4559efde8eb5d6262c88863a9fe2df88936b7685`
+- **PR:** [#1 — fix: harden LexiaCode public website and static release pipeline](https://github.com/julitodk06/lexiacode-website/pull/1) (**MERGED**)
+- **Tag Semántico & Release:** [`v1.0.0-hardened`](https://github.com/julitodk06/lexiacode-website/releases/tag/v1.0.0-hardened)
+- **Estrategia Aplicada:** **Squash Merge**
 
 ---
 
