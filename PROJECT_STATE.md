@@ -219,18 +219,25 @@ Config Entrypoints en raíz (4):
 - Plan de release estático con tags semánticos y estrategia de rollback basada en redeploy de artefactos `out/`.
 - Documentado en `docs/PHASE_5A_GOVERNANCE_READINESS.md`.
 
+### FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge [✓ COMPLETADA]
+- Validación integral de Release Candidate con todos los gates de calidad (16 tests, SSG build, reachability audit, security audit).
+- Estrategia de integración autorizada: **Squash Merge**.
+- Retiro del estado Draft del PR #1 a **Ready for Review**.
+- Elaboración del informe de preparación de release `docs/PHASE_5B_RELEASE_READINESS.md`.
+- Definición del plan de despliegue a producción `docs/PHASE_6_PRODUCTION_RELEASE_PLAN.md`.
+
 ---
 
 ## Próxima Tarea Pendiente
 
 La próxima unidad de trabajo es:
 
-**FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge**
+**FASE 6 — Despliegue y publicación en producción**
 
-*Nota: La ejecución de la FASE 5B permanece supeditada a autorización explícita de Julio. La FASE 6 (Despliegue y publicación en producción) permanece pendiente y sin desplegar.*
+*Nota: La ejecución de la FASE 6 (Merge a main, tag/release, despliegue a Hostinger y smoke tests post-deploy) permanece supeditada a autorización explícita de Julio. La infraestructura de producción permanece intacta.*
 
 ## Prompt exacto para iniciar la primera tarea
 
 ~~~text
-Actúa como Lead Architect y ejecuta exclusivamente la tarea “FASE 5B — Decisión autorizada sobre protección, estado Ready y estrategia de merge” en el repositorio julitodk06/lexiacode-website previa autorización explícita.
+Actúa como Lead Architect / Release Engineer y ejecuta la “FASE 6 — Despliegue y publicación en producción” en el repositorio julitodk06/lexiacode-website siguiendo el plan definido en docs/PHASE_6_PRODUCTION_RELEASE_PLAN.md.
 ~~~
