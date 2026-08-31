@@ -9,7 +9,7 @@
 > Tag de Release: [v1.0.0-hardened](https://github.com/julitodk06/lexiacode-website/releases/tag/v1.0.0-hardened)
 > Pull request: [Merged PR #1 — fix: harden LexiaCode public website and static release pipeline](https://github.com/julitodk06/lexiacode-website/pull/1)
 > Estado de CI en main: **SUCCESS** (Workflow `CI` en Node 20 LTS)
-> Estado de Producción: **NO DESPLEGADA** (Hostinger y DNS intactos; FASE 6 pendiente)
+> Estado de Producción: **DEPLOYED AND VERIFIED** (https://lexiacode.com — Release v1.0.0-hardened)
 
 ## Estado Actual
 
@@ -235,18 +235,17 @@ Config Entrypoints en raíz (4):
 - Validación de build limpio y 16 tests pasando en `main` (CI Run: `33327706643` en verde).
 - Documentado en `docs/PHASE_5C_POST_MERGE_CLOSEOUT.md`.
 
+### FASE 6 — Despliegue y publicación en producción [✓ COMPLETADA]
+- Despliegue del release `v1.0.0-hardened` (SHA: `4559efde8eb5d6262c88863a9fe2df88936b7685`) en `https://lexiacode.com`.
+- Preservación del backup pre-deploy `backup-lexiacode-pre-v1.0.0-hardened-20260830` fuera de `public_html`.
+- 200 archivos estáticos (~13.5 MB) publicados en el document root de Hostinger.
+- Verificación integral de smoke tests en producción (25 rutas públicas, HTTPS, sitemap.xml, robots.txt, 404, selectores ES/EN/PT, formulario de contacto, WhatsApp y chatbot).
+- Rollback no requerido; producción verificada y operativa.
+- Documentado en `docs/PHASE_6_PRODUCTION_RELEASE_REPORT.md`.
+
 ---
 
-## Próxima Tarea Pendiente
+## Estado de Mantenimiento y Evolución
 
-La próxima unidad de trabajo es:
-
-**FASE 6 — Despliegue y publicación en producción**
-
-*Nota: La ejecución de la FASE 6 (Despliegue de artefactos estáticos de `out/` a Hostinger y smoke tests post-deploy) permanece supeditada a autorización explícita de Julio. La infraestructura de producción permanece intacta.*
-
-## Prompt exacto para iniciar la primera tarea
-
-~~~text
-Actúa como Lead Architect / Release Engineer y ejecuta la “FASE 6 — Despliegue y publicación en producción” en el repositorio julitodk06/lexiacode-website siguiendo el plan definido en docs/PHASE_6_PRODUCTION_RELEASE_PLAN.md.
-~~~
+El ciclo de hardening y release `v1.0.0-hardened` ha finalizado con éxito. El proyecto entra en **modo de mantenimiento normal**:
+- Cualquier cambio o nueva funcionalidad debe canalizarse mediante una nueva rama (`feat/*` o `fix/*`), Pull Request hacia `main` con CI obligatorio y posterior generación de un nuevo release semántico.
